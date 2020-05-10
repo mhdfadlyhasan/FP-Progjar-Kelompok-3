@@ -1,2 +1,10 @@
 # FP-Progjar-Kelompok-3
-FP Progjar
+
+## Instalation
+```bash
+python -m pip install Django
+```
+## Run
+```bash
+python manage.py runserver 8080
+```
