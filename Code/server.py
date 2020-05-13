@@ -10,8 +10,11 @@ port = 8081
 server.bind((ip_address, port))
 server.listen(100)
 list_of_clients = []
+tuple_of_clients = []
 
 def clientthread(conn, addr):
+    username_target = conn.recv(2048).decode()
+    print("Targeted Username " + username_target)
     while True:
         try:
             message = conn.recv(2048).decode()
@@ -52,10 +55,18 @@ def broadcast(message, connection):
             except:
                 clients.close()
                 remove(clients)
+    # for clients in list_of_clients:
+    #     if clients != connection:
+    #         try:
+    #             clients.send(message.encode())
+    #         except:
+    #             clients.close()
+    #             remove(clients)
 
 def remove(connection):
     if connection in list_of_clients:
         list_of_clients.remove(connection)
+        print("removed")
 
 while True:
     conn, addr = server.accept()
