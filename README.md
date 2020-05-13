@@ -2,7 +2,7 @@
 
 ## Instalation
 ```bash
-python -m pip install Django
+pip install -r requirements.txt
 ```
 ## Run
 ```bash
