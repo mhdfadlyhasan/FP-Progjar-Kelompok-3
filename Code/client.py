@@ -6,22 +6,37 @@ import msvcrt
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 ip_address = '127.0.0.1'
 port = 8081
+
+# Input username & ID sendiri
 username = input("Please enter your username: ")
+your_id = input("Please enter your ID: ")
 server.connect((ip_address, port))
-server.send(username.encode())
+
+# Send username + id
+packet = username + ',' + your_id
+server.send(packet.encode())
+
+# Input id orang yang ingin di chat
+personal_id = input("Please enter the person's ID: ")
+personal = '<id>' + personal_id
+# print(personal)
+server.send(personal.encode())
 
 while True:
     sockets_list = [sys.stdin, server]
 
+    # Tunggu input
     ready_to_read = select.select([server], [], [], 1)[0]
     assert all(server.fileno() != -1 for server in ready_to_read)
     if msvcrt.kbhit(): ready_to_read.append(sys.stdin)
-    # read_socket, write_socket, error_socket = select.select(sockets_list, [], [])
 
+    
     for socks in ready_to_read:
+        # Terima message
         if socks == server:
                 message = socks.recv(2048).decode()
                 print(message[:-1])
+        # Send message
         else:
             message = sys.stdin.readline()
             server.send(message.encode())
