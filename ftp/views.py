@@ -1,11 +1,23 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
+from ftplib import FTP
+
+f = FTP()
+
+
+def login(request):
+    f.connect('127.0.0.1', 8009)
+    f.login('dex', '123')
+    # if(request.method == 'POST'):
+    pass
+
+
+def logout():
+    f.quit()
 
 
 def index(request):
-    return HttpResponse("Hello dex")
+    return render(request, 'ftp/index.html')
 
 
 def download(request, filename):
@@ -13,4 +25,4 @@ def download(request, filename):
 
 
 def upload(request):
-    pass
+    return HttpResponse("Test")

@@ -15,12 +15,13 @@ def main():
     handler = FTPHandler
     handler.authorizer = authorizer
 
-    address = ('', 8009)
+    address = ('127.0.0.1', 8009)
     server = FTPServer(address, handler)
 
     server.max_cons_per_ip = 5
 
-    server.serve_forever(timeout=20)
+    server.serve_forever()
+
 
 if __name__ == '__main__':
     main()
