@@ -26,7 +26,7 @@ while True:
     sockets_list = [sys.stdin, server]
 
     # Tunggu input
-    ready_to_read = select.select([server], [], [], 1)[0]
+    ready_to_read = select.select([server], [], [], 0.01)[0]#delay diperkecil biar lebih responsive
     assert all(server.fileno() != -1 for server in ready_to_read)
     if msvcrt.kbhit(): ready_to_read.append(sys.stdin)
 

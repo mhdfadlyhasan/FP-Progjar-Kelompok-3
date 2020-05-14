@@ -16,16 +16,20 @@ def clientthread(conn, addr):
     while True:
         try:
             message = conn.recv(2048).decode()
-            
             # Terima id orang yang akan di personal chat
             if (message[:4] == '<id>'):
                 unique_id = message[4:len(message)]
                 print(unique_id)
+                #tunjukkan list pesan ke pengguna! list didapat dari dataase
+                message = "selamat datang, riwayat pesan anda "
+                conn.send(message.encode())
+
             # Send message personal chat
             elif message:
                 print (addr[2] + ':' + message[:-1])
                 message_to_send = addr[2] + ':' + message
                 personal_chat(message_to_send, conn, addr[3], unique_id)
+                #put to db
             else:
                 remove(conn)
         except:
