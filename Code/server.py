@@ -12,15 +12,15 @@ server.listen(100)
 list_of_clients = []
 
 def clientthread(conn, addr):
+    unique_id = ""
     while True:
         try:
             message = conn.recv(2048).decode()
             
             # Terima id orang yang akan di personal chat
             if (message[:4] == '<id>'):
-                unique_id = message[-1]
-                # print(unique_id)
-
+                unique_id = message[4:len(message)]
+                print(unique_id)
             # Send message personal chat
             elif message:
                 print (addr[2] + ':' + message[:-1])
