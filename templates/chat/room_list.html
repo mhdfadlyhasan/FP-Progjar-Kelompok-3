@@ -1,0 +1,15 @@
+<html>
+    <head>
+    </head>
+    <body>
+        {% if chat_room_list %}
+        <ul>
+            {% for room in chat_room_list %}
+                <li><a href="/chat/{{ room.id }}/">{{ room.Chat_name }}</a></li>
+            {% endfor %}
+        </ul>
+        {% else %}
+            <p>No room are available.</p>
+        {% endif %}
+    </body>
+</html>
