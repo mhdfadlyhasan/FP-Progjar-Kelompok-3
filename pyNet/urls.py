@@ -18,5 +18,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('ftp/', include('ftp.urls'))
+    path('ftp/', include('ftp.urls')),
+    path('', include('chat.urls')),
 ]
