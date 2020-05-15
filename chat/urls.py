@@ -4,10 +4,10 @@ from . import views
 
 
 urlpatterns = [
-    # ex: /polls/
+    # ex: /chat/
     path('', views.login, name='login'),
-    # ex: /polls/5/
+    # ex: /chat/1/
     path('<int:Acc_id>/', views.room_list, name='room_list'),
-    # ex: /polls/5/results/
+    # ex: /chat/1/1/
     path('<int:Acc_id>/<int:Chat_id>/', views.message_list, name='message_list'),
 ]
