@@ -4,7 +4,7 @@ from django.db import models
 class Account(models.Model):
     Acc_name = models.CharField(max_length=50)
     Acc_email = models.CharField(max_length=50)
-
+    Acc_password = models.CharField(max_length=50)
 
 class Chat(models.Model):
     Chat_name = models.CharField(max_length=50)
