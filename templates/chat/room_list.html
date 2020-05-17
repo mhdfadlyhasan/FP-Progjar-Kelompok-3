@@ -2,10 +2,11 @@
     <head>
     </head>
     <body>
+        
         {% if chat_room_list %}
         <ul>
             {% for room in chat_room_list %}
-                <li><a href="/chat/{{user_id}}/{{ room.id }}/">{{ room.Chat_name }}</a></li>
+                <li><a href="/chat/{{user_id}}/{{ room.id }}/">{{ room.Chat_id.Chat_name }}</a></li>
             {% endfor %}
         </ul>
         {% else %}
