@@ -1,39 +1,51 @@
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from chat.models import Account
-from .form_login import Login,SignUp
+from .form_login import SignUp, Login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
 
-
+@login_required(login_url='/login/')
+def home(request):
+    print("User is logged in!")
+    return redirect('home')
 
 
 def signup(request):
     print(request.method)
     if request.method == 'POST':
-        form = SignUp(request.POST)
+        form = UserCreationForm(request.POST)
         print(request)
         if form.is_valid():
-            form.save()
-            Acc_name = form.cleaned_data.get('user_name_chat')
-            email = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
-            user = Account(Acc_name=Acc_name,Acc_email=email,Acc_password=raw_password)
-            user.save()
+            User_name = form.cleaned_data.get('username')
+            
+            user = form.save()
+            login(request, user,backend='django.contrib.auth.backends.ModelBackend')
+            Accounts = Account(Acc_name=User_name,Acc_password=raw_password)
+            Accounts.save()
             return redirect('home')
         else:
             print("form is not valid")
     else:
-        form = SignUp()
+        form = UserCreationForm()
     return render(request, './registration/register.html', {'form': form})
 
-def login(request):
+def logins(request):
     if request.method == 'POST':
         form = Login(request.POST)
         if form.is_valid():
-            email = form.cleaned_data.get('email')
+            
+            username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password')
-            print(email,raw_password)
-            print(request)
-            return redirect('home')
+            
+            user = authenticate(username=username, password=raw_password)
+            if user:
+                login(request, user)
+                return redirect('home')
+            else: 
+                print("User is not found" )
+                return redirect('Login')
         else:
             print("form is not valid")
     else:
