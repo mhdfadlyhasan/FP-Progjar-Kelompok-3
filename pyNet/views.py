@@ -19,6 +19,8 @@ def signup(request):
             raw_password = form.cleaned_data.get('password1')
             User_name = form.cleaned_data.get('username')
             user = form.save()
+            user.is_active = False
+            user.save()
             login(request, user,backend='django.contrib.auth.backends.ModelBackend')
             return redirect('home')
         else:
@@ -35,8 +37,9 @@ def logins(request):
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password')
             
-            user = authenticate(username=username, password=raw_password)
+            user = authenticate(username=username, password=raw_password, is_active = True)
             if user:
+                print (user.is_active)
                 login(request, user)
                 return redirect('home')
             else: 

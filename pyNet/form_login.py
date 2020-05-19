@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 
 class Login(forms.Form):
-    username = forms.CharField(label='Username', max_length=100)
+    username = forms.CharField(label='username', max_length=100)
     password = forms.CharField(widget=forms.PasswordInput(),label='password', max_length=100)
 
 class SignUp (UserCreationForm):#exteding UserCreation, adding UsernameChat!
