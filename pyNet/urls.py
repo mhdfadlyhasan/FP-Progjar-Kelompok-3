@@ -22,7 +22,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('ftp/', include('ftp.urls')),
     path('chat/', include('chat.urls')),
+    path('login/', views.login, name='Login'),
     path('', include('django.contrib.auth.urls')),#ini bawaan dari django! untuk authentications!
     path('', TemplateView.as_view(template_name='home.html'), name='home'),
-    path('registration/', views.signup, name='Register')
+    path('registration/', views.signup, name='Register'),
 ]

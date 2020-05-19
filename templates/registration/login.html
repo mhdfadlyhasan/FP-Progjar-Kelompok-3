@@ -3,8 +3,12 @@
 {% block title %}FTP Index{% endblock %}
 
 {% block content %}
-
     <div class="card" style="width: 18rem;">
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Log in</button>
+          </form> 
         <div class="card-header">
             Login Takbiran ya balapan
         </div>
