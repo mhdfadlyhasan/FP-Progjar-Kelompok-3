@@ -1,6 +1,5 @@
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
-from chat.models import Account
 from .form_login import SignUp, Login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
@@ -19,11 +18,8 @@ def signup(request):
         if form.is_valid():
             raw_password = form.cleaned_data.get('password1')
             User_name = form.cleaned_data.get('username')
-            
             user = form.save()
             login(request, user,backend='django.contrib.auth.backends.ModelBackend')
-            Accounts = Account(Acc_name=User_name,Acc_password=raw_password)
-            Accounts.save()
             return redirect('home')
         else:
             print("form is not valid")
