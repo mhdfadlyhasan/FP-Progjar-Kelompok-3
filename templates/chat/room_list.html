@@ -2,7 +2,7 @@
     <head>
     </head>
     <body>
-        
+        <a href="{% url 'Logout' %}">Log out</a>
         {% if chat_room_list %}
         <ul>
             {% for room in chat_room_list %}
