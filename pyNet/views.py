@@ -92,6 +92,6 @@ def activate(request, uidb64, linkToken):
         return redirect('home')
     return "<h3>Something is wrong</h3>"
 
-def logouts(request):
+def logout_(request):
     logout(request)
     return redirect('login')

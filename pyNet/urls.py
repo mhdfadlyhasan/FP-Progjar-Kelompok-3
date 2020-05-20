@@ -21,7 +21,7 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('ftp/', include('ftp.urls')),
-    path('logout/', views.logouts, name='Logout'),
+    path('logout/', views.logout_, name='Logout'),
     path('', include('chat.urls'),name='home'),
     path('', include('django.contrib.auth.urls')),#ini bawaan dari django! untuk authentications!
     
