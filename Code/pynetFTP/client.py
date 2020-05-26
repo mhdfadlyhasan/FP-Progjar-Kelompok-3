@@ -6,24 +6,30 @@ from zipfile import ZipFile
 
 
 class ClientFtp:
+    isConnect = False
+    server = None
+
     def __init__(self):
         self.server = FTP()
 
     def connect(self):
         self.server.connect('127.0.0.1', 8009)
         self.server.login('dex', '123')
+        self.isConnect = True
+        return self
 
     def listdir(self, *args):
         list_res = []
+        list_fname = []
         dirs = args[0]
         # Using mlsd not retrlines. Kalau mau buat callback di retrlines, terserah.
         dir_yield = self.server.mlsd(dirs, facts=['types', 'size', 'perm'])
         for path in dir_yield:
             abs_path = os.path.abspath(path[0])
             file_path = PurePath(abs_path).as_uri()
-            print(file_path)
+            list_fname.append(path[0])
             list_res.append(file_path)
-        return list_res
+        return {'filenames': list_fname, 'paths': list_res}
 
     def download(self, *args):
         res = []
