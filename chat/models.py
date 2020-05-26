@@ -16,3 +16,10 @@ class Message(models.Model):
     msg = models.CharField(max_length=50)
     Acc_sent = models.ForeignKey(User, on_delete=models.CASCADE)
     get_time = models.DateTimeField()
+
+# class Room_Chat(models.Model):
+#     name = models.CharField(max_length=20)
+
+# class Room_Member(models.Model):
+#     Room_ID = models.ForeignKey(Room_Chat, on_delete=models.CASCADE)
+#     Acc_ID = models.ForeignKey(User, on_delete=models.CASCADE)
