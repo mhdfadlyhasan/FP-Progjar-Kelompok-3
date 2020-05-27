@@ -11,14 +11,14 @@ class FTPServerModel:
     authorizer = None
     handler = None
     address = ('127.0.0.1', 8009)
-    default_path = os.path.abspath('.')
+    default_path = os.path.abspath('../file')
     permission_attr = 'elradfmwMT'
 
     def __init__(self, address=('127.0.0.1', 8009), username='dex', password='123'):
         self.address = address
         self.password = password
         self.username = username
-        self.authorizer = DummyAuthorizer()
+        self.authorizer_server()
         self.handler_server()
         self.connect()
 
