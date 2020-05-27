@@ -8,24 +8,56 @@
         <div class="row">
             <div class="col-sm-3">
                 <ul class="list-group">
-                    <li class="list-group-item active" >List Files</li>
-                    <li class="list-group-item">List Folders</li>
+                    <li id="listFiles" class="list-group-item active">List Files</li>
+                    <li id="listFolders" class="list-group-item">List Folders</li>
                 </ul>
             </div>
 
             <div class="col-sm-9">
                 <div class="card">
-                <div class="card-header">List Files</div>
+                    <div class="card-header">List Files</div>
                     <div class="card-body">
-                        {% for filename in filenames %}
-                            <div class="container">
-                                {{ filename }}
-                            </div>
-                        {% endfor %}
+                        <ul class="list-group list-group-flush">
+                            {% for filename in filenames %}
+                                <a href="{% url 'ftp:download' filename %}">
+                                    <li class="list-group-item">{{ filename }}</li>
+                                </a>
+                            {% endfor %}
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+{% endblock %}
+
+{% block js %}
+
+{#    <script>#}
+{#        $(document).ready(() => {#}
+{##}
+{#            $.get("{% url 'ftp:fetchDir' %}", (data, status) => {#}
+{#                let dirs = data.dirs;#}
+{#                console.log(data);#}
+{##}
+{#                if (dirs !== null) {#}
+{#                    let filenames = [];#}
+{#                    let types = {};#}
+{#                    dirs.forEach(dir => {#}
+{#                        filenames.push(dir[0])#}
+{#                        types[dir[0]] = dir[1].type#}
+{#                    })#}
+{#                    console.log(filenames, types)#}
+{##}
+{##}
+{#                    let templateListFiles = "<div></div>";#}
+{##}
+{#                }#}
+{#            })#}
+{##}
+{##}
+{#        });#}
+{#    </script>#}
 
 {% endblock %}

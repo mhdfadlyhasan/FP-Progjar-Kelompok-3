@@ -1,73 +1,87 @@
-import os
 from ftplib import FTP
-from pathlib import Path
-from pathlib import PurePath
+from pathlib import PurePath, Path
 from zipfile import ZipFile
+import os
 
 
-class ClientFtp:
-    isConnect = False
-    server = None
+class FTPClientModel:
+    isConnected = False
+    client = None
+    username = 'dex'
+    password = '123'
+    address = '127.0.0.1'
+    port = 8009
+
+    remoteHist = []
+    remoteCurrentPath = f".{os.path.sep}"
 
     def __init__(self):
-        self.server = FTP()
+        self.client = FTP()
 
-    def connect(self):
-        self.server.connect('127.0.0.1', 8009)
-        self.server.login('dex', '123')
-        self.isConnect = True
+    def connect(self, username=None, password=None, address=None, port=None):
+        self.client.connect(address or self.address, port or self.port)
+        self.client.login(username or self.username, password or self.password)
+        self.isConnected = True
         return self
 
-    def listdir(self, *args):
-        list_res = []
-        list_fname = []
+    def disconnect(self):
+        if self.isConnected:
+            self.isConnected = False
+            self.client.quit()
+
+    def list_dir(self, *args) -> list:
+        list_dir = []
+        files_path = []
         dirs = args[0]
         # Using mlsd not retrlines. Kalau mau buat callback di retrlines, terserah.
-        dir_yield = self.server.mlsd(dirs, facts=['types', 'size', 'perm'])
+        dir_yield = self.client.mlsd(dirs, facts=['type', 'size', 'perm', 'modify', 'create'])
         for path in dir_yield:
             abs_path = os.path.abspath(path[0])
-            file_path = PurePath(abs_path).as_uri()
-            list_fname.append(path[0])
-            list_res.append(file_path)
-        return {'filenames': list_fname, 'paths': list_res}
+            # file_path = PurePath(abs_path)
+            files_path.append(abs_path)
 
-    def download(self, *args):
-        res = []
+            list_dir.append(path)
 
-        for arg in args:
-            fname = f"{arg}"
-            if Path(arg).is_dir():
-                with ZipFile(arg) as z:
-                    fname = f"{arg}.zip"
-                    z.write(filename=fname)
+        # TODO: FILES_PATH tidak absolut dari path aslinya
+        # return list_dir, files_path
+        return list_dir
 
-            with open(fname, 'wb') as fd:
-                self.server.retrbinary('RETR ' + fname, fd.write, 1024)
-                res.append(fd)
-                print(fd)
+    def download(self, item, sourceName, destPath) -> bool:
+        sourcePath = os.path.join(self.remoteCurrentPath, os.path.sep + sourceName)
 
-        return res
+        # Not tested yet
+        with open(destPath, 'wb') as file:
+            self.client.retrbinary(f'RETR {sourcePath}',
+                                   callback=lambda data: file.write(data))
+        # Force check
+        return Path(destPath).is_file()
 
-    def upload(self, *args):
-        res = []
+    def upload(self, sourcePath, destName):
+        destPath = os.path.join(self.remoteCurrentPath, os.path.sep + destName)
+        # CALLBACK not working yet
+        # progres = None
 
-        for arg in args:
-            with open(arg, 'rb') as fd:
-                self.server.storbinary('STOR ', arg, fd, 1024)
+        with open(sourcePath, 'rb') as file:
+            self.client.storbinary(f'STOR {destPath}',
+                                   fp=file, callback=None)
 
-    def changedir(self, **kwargs):
-        global to_path
-        if kwargs is not None:
-            for key, val in kwargs.items():
-                if key == 'from':
-                    from_path = val
-                elif key == 'to':
-                    to_path = val
+    def change_dir(self, path=".") -> list:
+        fullpath = os.path.join(self.remoteCurrentPath, os.path.sep + path)
+        self.client.cwd(fullpath)
 
-            self.server.cwd(to_path)
+        self.remoteHist.append(fullpath)
+        self.remoteCurrentPath = fullpath
+
+        return self.list_dir(fullpath)
 
 
 if __name__ == '__main__':
-    client = ClientFtp()
+    client = FTPClientModel()
     client.connect()
-    client.listdir('.')
+    client.upload(f"{os.path.abspath('file')}\\abc.txt",
+                  "/folder1/cloneabc.txt")
+    result = client.list_dir('.')
+    print(result)
+    result = client.change_dir('folder1')
+    print(result)
+    client.client.quit()
