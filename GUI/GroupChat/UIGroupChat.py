@@ -9,6 +9,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_group_chat_window(object):
     def setupUi(self, group_chat_window):
         group_chat_window.setObjectName("group_chat_window")
@@ -19,7 +20,7 @@ class Ui_group_chat_window(object):
         self.show_member.setGeometry(QtCore.QRect(690, 10, 75, 23))
         self.show_member.setObjectName("show_member")
         self.group_name = QtWidgets.QLabel(self.centralwidget)
-        self.group_name.setGeometry(QtCore.QRect(80, 0, 91, 51))
+        self.group_name.setGeometry(QtCore.QRect(30, 0, 91, 51))
         self.group_name.setObjectName("group_name")
         self.upper_line = QtWidgets.QFrame(self.centralwidget)
         self.upper_line.setGeometry(QtCore.QRect(0, 50, 801, 16))
@@ -51,6 +52,7 @@ class Ui_group_chat_window(object):
         self.member_name_layout.setContentsMargins(0, 0, 0, 0)
         self.member_name_layout.setObjectName("member_name_layout")
         self.member_name = QtWidgets.QLabel(self.verticalLayoutWidget)
+        self.member_name.setEnabled(True)
         self.member_name.setFrameShape(QtWidgets.QFrame.Box)
         self.member_name.setObjectName("member_name")
         self.member_name_layout.addWidget(self.member_name)
@@ -61,14 +63,9 @@ class Ui_group_chat_window(object):
         self.statusbar = QtWidgets.QStatusBar(group_chat_window)
         self.statusbar.setObjectName("statusbar")
         group_chat_window.setStatusBar(self.statusbar)
+
         self.retranslateUi(group_chat_window)
         QtCore.QMetaObject.connectSlotsByName(group_chat_window)
-
-        # Custom
-        self.member_name_container.hide()
-
-        # Connecting to functions
-        self.show_member.clicked.connect(self.member_list)
 
     def retranslateUi(self, group_chat_window):
         _translate = QtCore.QCoreApplication.translate
@@ -79,12 +76,6 @@ class Ui_group_chat_window(object):
         self.member_name.setText(_translate("group_chat_window", " Members Name"))
         self.invite.setText(_translate("group_chat_window", "Invite"))
 
-    # Button click testing
-    def member_list(self):
-        if self.member_name_container.isVisible():
-            self.member_name_container.hide()
-        else:
-            self.member_name_container.show()
 
 if __name__ == "__main__":
     import sys

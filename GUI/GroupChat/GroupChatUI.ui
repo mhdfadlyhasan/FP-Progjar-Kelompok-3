@@ -24,13 +24,13 @@
      </rect>
     </property>
     <property name="text">
-     <string>Show Member</string>
+     <string>Members</string>
     </property>
    </widget>
    <widget class="QLabel" name="group_name">
     <property name="geometry">
      <rect>
-      <x>80</x>
+      <x>30</x>
       <y>0</y>
       <width>91</width>
       <height>51</height>
@@ -100,6 +100,54 @@
     </property>
     <property name="text">
      <string>File</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="member_name_container" native="true">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>60</y>
+      <width>761</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <widget class="QWidget" name="verticalLayoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>761</width>
+       <height>80</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="member_name_layout">
+      <item>
+       <widget class="QLabel" name="member_name">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="text">
+         <string> Members Name</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QPushButton" name="invite">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>10</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Invite</string>
     </property>
    </widget>
   </widget>
