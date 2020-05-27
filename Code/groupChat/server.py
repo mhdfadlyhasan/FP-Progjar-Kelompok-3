@@ -2,6 +2,9 @@ import socket
 import select
 import sys
 import threading
+from django.core.management import settings
+
+from chat.models import Room, Room_Acc, Message
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -24,14 +27,20 @@ def clientthread(conn, addr):
                 print('Client with ID ' + str(addr[3]) + ' has left the application')
 
             elif (message[:8] == '<create>'):
-
                 split = message.split(' ')
+                # print(split[1])
 
                 # code create room di DB disini
+                room = 'Room ' + split[1]
+                # print(room)
+                r = Room.objects.create(Room_name= room)
+                print(r.Room_name)
+
+                print('Room Created with ID ' + split[1]) 
+                # room_acc = Room_Acc()
 
                 # Room dummy untuk testing awal
-                room_example.append((conn, str(addr[3])))
-                print('Room Created with ID ' + split[1]) 
+                # room_example.append((conn, str(addr[3])))
 
             elif (message[:8] == '<invite>'):
                 split = message.split(' ')

@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 # Create your views here.
 from django.http import HttpResponse
 from .models import Message
-from .models import Chat_Acc
+from .models import Room_Acc
 from django.template import loader
 
 #untuk return menu awal chat, dulunya login
@@ -27,7 +27,7 @@ def message_list(request, Chat_id):
 
 @login_required(login_url='/login/')
 def room_list(request):
-    chat_room_list = Chat_Acc.objects.select_related().filter(Acc_id=request.user.id)
+    chat_room_list = Room_Acc.objects.select_related().filter(Acc_id=request.user.id)
     template = loader.get_template('chat/room_list.html')
     context = {
         'chat_room_list': chat_room_list,
