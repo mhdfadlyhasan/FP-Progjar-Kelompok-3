@@ -53,24 +53,11 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QScrollBar" name="scrollbar">
-    <property name="geometry">
-     <rect>
-      <x>780</x>
-      <y>60</y>
-      <width>16</width>
-      <height>391</height>
-     </rect>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
-    </property>
-   </widget>
    <widget class="Line" name="bottomline">
     <property name="geometry">
      <rect>
       <x>-3</x>
-      <y>440</y>
+      <y>490</y>
       <width>801</width>
       <height>20</height>
      </rect>
@@ -79,21 +66,11 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QTextEdit" name="textEdit">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>490</y>
-      <width>781</width>
-      <height>81</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QPushButton" name="file">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>460</y>
+      <y>510</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -101,41 +78,6 @@
     <property name="text">
      <string>File</string>
     </property>
-   </widget>
-   <widget class="QWidget" name="member_name_container" native="true">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>60</y>
-      <width>761</width>
-      <height>81</height>
-     </rect>
-    </property>
-    <widget class="QWidget" name="verticalLayoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>761</width>
-       <height>80</height>
-      </rect>
-     </property>
-     <layout class="QVBoxLayout" name="member_name_layout">
-      <item>
-       <widget class="QLabel" name="member_name">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::Box</enum>
-        </property>
-        <property name="text">
-         <string> Members Name</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
    </widget>
    <widget class="QPushButton" name="invite">
     <property name="geometry">
@@ -148,6 +90,26 @@
     </property>
     <property name="text">
      <string>Invite</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="message_list">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>70</y>
+      <width>781</width>
+      <height>421</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="input">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>540</y>
+      <width>781</width>
+      <height>31</height>
+     </rect>
     </property>
    </widget>
   </widget>
