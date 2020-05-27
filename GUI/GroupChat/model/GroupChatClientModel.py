@@ -4,6 +4,7 @@ import sys
 import msvcrt
 
 class GroupChatClientModel:
+
     isConnected = False
     server = None
 
@@ -24,8 +25,6 @@ class GroupChatClientModel:
         packet = username + ',' + your_id
         self.server.send(packet.encode())
 
-        return self
-
     def group_chat(self):
 
         sockets_list = [sys.stdin, self.server]
@@ -40,7 +39,7 @@ class GroupChatClientModel:
             if socks == self.server:
                 message = socks.recv(2048).decode()
                 print(message)
-
+            
             # Send message
             else:
                 message = sys.stdin.readline()
@@ -70,12 +69,13 @@ class GroupChatClientModel:
                 
                 sys.stdout.flush()
 
+    def main(self):
+        self.connect()
+
+        while True:
+            self.group_chat()
+
 if __name__ == '__main__':
     model = GroupChatClientModel()
-    model.connect()
-
-    while True:
-        model.group_chat()
+    model.main()
         
-
-

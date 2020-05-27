@@ -115,9 +115,12 @@ class GroupChatServerModel:
         # print(conn)
         threading.Thread(target=self.clientthread, args=(conn, addr)).start()
 
+    def main(self):
+
+        while True:
+            self.server_start()
+
 if __name__ == '__main__':
-
     model = GroupChatServerModel()
-
-    while True:
-        model.server_start()
+    model.main()
+    
