@@ -1,13 +1,13 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from view.UIGroupChat import UIGroupChat
+from view.Ui_group_chat_window import Ui_group_chat_window
 # Only needed for access to command line arguments
 import sys
 
 
 # Subclass QMainWindow to customise your application's main window
-class MainWindow(QMainWindow, UIGroupChat):
+class MainWindow(QMainWindow, Ui_group_chat_window):
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
