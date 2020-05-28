@@ -15,6 +15,7 @@ class Ui_group_chat_window(object):
     model = GroupChatClientModel()
     username = None
 
+    # GUI group chat window
     def setupUi(self, group_chat_window):
         group_chat_window.setObjectName("group_chat_window")
         group_chat_window.resize(800, 600)
@@ -77,11 +78,20 @@ class Ui_group_chat_window(object):
         self.file.setText(_translate("group_chat_window", "File"))
         self.invite.setText(_translate("group_chat_window", "Invite"))
 
-    # Custom
+    # Custom Functions
     def message_input(self):
+
+        # Ambil input dari GUI
         message = self.input.text()
         self.input.clear()
-        self.message_list.append(str(self.username) + ': ' + str(message))
+
+        # Print input user di message list
+        if (message[0] == '<'):
+            pass
+        else:
+            self.message_list.append(str(self.username) + ': ' + str(message))
+        
+        # Send message ke server setelah diproses di client model
         self.model.group_chat(message)
 
 if __name__ == "__main__":

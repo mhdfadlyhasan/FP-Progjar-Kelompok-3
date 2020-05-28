@@ -3,12 +3,11 @@ import select
 import sys
 import msvcrt
 
-username = None
-
 class GroupChatClientModel:
 
     isConnected = False
     server = None
+    username = None
 
     def __init__(self):
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -18,17 +17,18 @@ class GroupChatClientModel:
         port = 8081
 
         # Input username & ID sendiri
-        username = input("Please enter your username: ")
+        self.username = input("Please enter your username: ")
         your_id = input("Please enter your ID: ")
         self.server.connect((ip_address, port))
         self.isConnected = True
 
         # Send username + id
-        packet = username + ',' + your_id
+        packet = self.username + ',' + your_id
         self.server.send(packet.encode())
 
-        return username
+        return self.username
 
+    # Function terima input dari user
     def group_chat(self, message):
   
         # Format <create> ID_room
@@ -53,26 +53,27 @@ class GroupChatClientModel:
             message = '<group>' + message
             # print(message)
             self.server.send(message.encode())
-            sys.stdout.flush()
+        
+        sys.stdout.flush()
     
+    # Function terima message dari DB
     def ready_to_read(self):
+        sockets_list = [self.server]
+
         while True:
-            sockets_list = [sys.stdin, self.server]
 
-            ready_to_read = select.select([self.server], [], [], 0.01)[0] #delay diperkecil biar lebih responsive
-            assert all(self.server.fileno() != -1 for self.server in ready_to_read)
-            if msvcrt.kbhit(): ready_to_read.append(sys.stdin)
-
-            for socks in ready_to_read:
+            read_sockets, _ , exception_sockets = select.select(sockets_list, [], sockets_list)
+           
+            for socks in read_sockets:
                 # Terima message
                 if socks == self.server:
-                    print('here')
+                    print('masuk')
                     message = socks.recv(2048).decode()
                     # print(message)      
 
     def main(self):
         username = self.connect()       
-        self.group_chat()
+        self.ready_to_read()
 
 if __name__ == '__main__':
     model = GroupChatClientModel()

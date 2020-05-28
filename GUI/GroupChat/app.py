@@ -15,20 +15,22 @@ class MainWindow(QMainWindow, Ui_group_chat_window):
         super(MainWindow, self).__init__(*args, **kwargs)
 
         self.setupUi(self)
+
+        # Panggil function untuk start thread
         self.receive_function()
 
     def receive_function(self):
         self.thread = receive_message(self)
         self.thread.start()
 
+# Untuk thread ambil message dari DB
 class receive_message(QThread, GroupChatClientModel):
-
-    message = pyqtSignal()
 
     def __init__(self, *args, **kwargs):
         super(receive_message, self).__init__(*args, **kwargs)
         self.args = args
         self.kwargs = kwargs
+        print('ready to read init')
 
     def run(self):
         self.ready_to_read()

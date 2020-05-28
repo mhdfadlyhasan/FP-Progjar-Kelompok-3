@@ -19,7 +19,6 @@ class GroupChatServerModel:
         self.server.listen(100)
 
     def clientthread(self, conn, addr):
-        
         while True:
             try:
                 message = conn.recv(2048).decode()
@@ -84,6 +83,7 @@ class GroupChatServerModel:
         for clients, unique_id in self.room_example:
             if unique_id != sender_id:
                 try:
+                    print('broadcasted')
                     clients.send(message.encode())
                 except:
                     clients.close()
