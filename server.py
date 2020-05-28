@@ -2,9 +2,14 @@ import socket
 import select
 import sys
 import threading
-from django.core.management import settings
+import os
+import django
 
-from chat.models import Room, Room_Acc, Message
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pyNet.settings')
+django.setup()
+from django.db import models
+# from django.contrib.auth.models import User
+from chat.models import Room, Room_Acc
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -31,16 +36,16 @@ def clientthread(conn, addr):
                 # print(split[1])
 
                 # code create room di DB disini
-                room = 'Room ' + split[1]
-                # print(room)
-                r = Room.objects.create(Room_name= room)
-                print(r.Room_name)
+                room = Room(RoomName=split[1])
+                room.save()
 
                 print('Room Created with ID ' + split[1]) 
-                # room_acc = Room_Acc()
+                memb = int(addr[3])
+                member = Room_Acc.objects.create(AccID=memb, RoomID=room)
+                
 
                 # Room dummy untuk testing awal
-                # room_example.append((conn, str(addr[3])))
+                room_example.append((conn, str(addr[3])))
 
             elif (message[:8] == '<invite>'):
                 split = message.split(' ')

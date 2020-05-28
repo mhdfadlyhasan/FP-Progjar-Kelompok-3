@@ -1,7 +1,7 @@
 import socket
 import select
 import sys
-import msvcrt
+# import msvcrt
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 ip_address = '127.0.0.1'
@@ -37,7 +37,8 @@ while True:
             # Tunggu input
             ready_to_read = select.select([server], [], [], 0.01)[0] #delay diperkecil biar lebih responsive
             assert all(server.fileno() != -1 for server in ready_to_read)
-            if msvcrt.kbhit(): ready_to_read.append(sys.stdin)
+            # if msvcrt.kbhit(): 
+            ready_to_read.append(sys.stdin)
 
             for socks in ready_to_read:
                 # Terima message
@@ -62,7 +63,8 @@ while True:
             # Tunggu input
             ready_to_read = select.select([server], [], [], 0.01)[0] #delay diperkecil biar lebih responsive
             assert all(server.fileno() != -1 for server in ready_to_read)
-            if msvcrt.kbhit(): ready_to_read.append(sys.stdin)
+            # if msvcrt.kbhit():
+            ready_to_read.append(sys.stdin)
 
             for socks in ready_to_read:
                 # Terima message
