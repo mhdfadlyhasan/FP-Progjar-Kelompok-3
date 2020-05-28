@@ -36,20 +36,20 @@ class GroupChatServerModel:
 
                     # Room dummy untuk testing awal
                     self.room_example.append((conn, str(addr[3])))
-                    print('Room Created with ID ' + split[1]) 
+                    print('Room Created with ID ' + split[1])
+                    # print (self.room_example) 
 
                 elif (message[:8] == '<invite>'):
                     split = message.split(' ')
                     invite_id = split[1]
 
                     for client in self.list_of_clients:
-                        if (client[1] == invite_id[:-1]):
+                        if (client[1] == invite_id):
                             print("Receiver ID: " + client[1])
                             client_conn = client[0]
-                            # print(client_conn)
 
-                    self.room_example.append((client_conn, invite_id[:-1])) 
-                    # print (room_example)
+                    self.room_example.append((client_conn, invite_id))
+                    # print (self.room_example)  
 
                 elif (message[:6] == '<join>'):
                     print('join')
@@ -64,9 +64,9 @@ class GroupChatServerModel:
 
                 # Send message group chat
                 elif (message[:7] == '<group>'):
-                    message_to_send = addr[2] + ':' + message[7:-1]
+                    message_to_send = addr[2] + ':' + message[7:]
                     sender_id = str(addr[3])
-                    print (addr[2] + ':' + message[7:-1])
+                    print (addr[2] + ':' + message[7:])
 
                     # Code broadcast dengan room id disini
 
@@ -112,7 +112,6 @@ class GroupChatServerModel:
         # Register id
         self.list_of_clients.append((conn, str(addr[3]))) 
         print (str(addr[2]) + ' has joined the chat with ID ' + str(addr[3]))
-        # print(conn)
         threading.Thread(target=self.clientthread, args=(conn, addr)).start()
 
     def main(self):

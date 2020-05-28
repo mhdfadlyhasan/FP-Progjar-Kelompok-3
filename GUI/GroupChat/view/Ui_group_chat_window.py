@@ -8,8 +8,13 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from model.GroupChatClientModel import GroupChatClientModel
 
 class Ui_group_chat_window(object):
+
+    model = GroupChatClientModel()
+    username = None
+
     def setupUi(self, group_chat_window):
         group_chat_window.setObjectName("group_chat_window")
         group_chat_window.resize(800, 600)
@@ -61,6 +66,9 @@ class Ui_group_chat_window(object):
         self.retranslateUi(group_chat_window)
         QtCore.QMetaObject.connectSlotsByName(group_chat_window)
 
+        # Client Connect
+        self.username = self.model.connect()
+
     def retranslateUi(self, group_chat_window):
         _translate = QtCore.QCoreApplication.translate
         group_chat_window.setWindowTitle(_translate("group_chat_window", "MainWindow"))
@@ -72,7 +80,9 @@ class Ui_group_chat_window(object):
     # Custom
     def message_input(self):
         message = self.input.text()
-        print(message)
+        self.input.clear()
+        self.message_list.append(str(self.username) + ': ' + str(message))
+        self.model.group_chat(message)
 
 if __name__ == "__main__":
     import sys

@@ -15,20 +15,24 @@ class MainWindow(QMainWindow, Ui_group_chat_window):
         super(MainWindow, self).__init__(*args, **kwargs)
 
         self.setupUi(self)
+        self.receive_function()
 
-class ClientStart(QThread):
+    def receive_function(self):
+        self.thread = receive_message(self)
+        self.thread.start()
 
-    def __init__(self):
-        QThread.__init__(self)
+class receive_message(QThread, GroupChatClientModel):
 
-    def __del__(self):
-        self.wait()
+    message = pyqtSignal()
+
+    def __init__(self, *args, **kwargs):
+        super(receive_message, self).__init__(*args, **kwargs)
+        self.args = args
+        self.kwargs = kwargs
 
     def run(self):
-        
-        # Instantiation
-        client = GroupChatClientModel()
-        client.main()
+        self.ready_to_read()
+        # print(message)
 
 # You need one (and only one) QApplication instance per application.
 # Pass in sys.argv to allow command line arguments for your app.
@@ -37,10 +41,6 @@ app = QApplication(sys.argv)
 
 window = MainWindow()
 window.show()  # IMPORTANT!!!!! Windows are hidden by default.
-
-#Thread
-client_thread = ClientStart()
-client_thread.start()
 
 # Start the event loop.
 app.exec_()
