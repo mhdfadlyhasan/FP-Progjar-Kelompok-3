@@ -8,18 +8,14 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from model.GroupChatClientModel import GroupChatClientModel
+
 
 class Ui_group_chat_window(object):
-
-    model = GroupChatClientModel()
-    username = None
-
-    # GUI group chat window
     def setupUi(self, group_chat_window):
         group_chat_window.setObjectName("group_chat_window")
         group_chat_window.resize(800, 600)
         self.centralwidget = QtWidgets.QWidget(group_chat_window)
+        self.centralwidget.setGeometry(QtCore.QRect(0, 0, 798, 571))
         self.centralwidget.setObjectName("centralwidget")
         self.show_member = QtWidgets.QPushButton(self.centralwidget)
         self.show_member.setGeometry(QtCore.QRect(690, 10, 75, 23))
@@ -50,35 +46,16 @@ class Ui_group_chat_window(object):
         self.input.setGeometry(QtCore.QRect(10, 540, 781, 31))
         self.input.setObjectName("input")
         self.statusbar = QtWidgets.QStatusBar(group_chat_window)
+        self.statusbar.setGeometry(QtCore.QRect(0, 0, 3, 18))
         self.statusbar.setObjectName("statusbar")
 
         self.retranslateUi(group_chat_window)
         QtCore.QMetaObject.connectSlotsByName(group_chat_window)
 
-        # Client Connect
-        self.username = self.model.connect()
-
     def retranslateUi(self, group_chat_window):
         _translate = QtCore.QCoreApplication.translate
-        group_chat_window.setWindowTitle(_translate("group_chat_window", "Chat Window"))
+        group_chat_window.setWindowTitle(_translate("group_chat_window", "MainWindow"))
         self.show_member.setText(_translate("group_chat_window", "Members"))
         self.group_name.setText(_translate("group_chat_window", "Group Name"))
         self.file.setText(_translate("group_chat_window", "File"))
         self.invite.setText(_translate("group_chat_window", "Invite"))
-
-    # Custom Functions
-    def message_input(self):
-
-        # Ambil input dari GUI
-        message = self.input.text()
-        self.input.clear()
-
-        # Print input user di message list
-        if (message[0] == '<'):
-            pass
-        else:
-            self.message_list.append(str(self.username) + ': ' + str(message))
-        
-        # Send message ke server setelah diproses di client model
-        self.model.group_chat(message)
-
