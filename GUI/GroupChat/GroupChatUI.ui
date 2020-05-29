@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>group_chat_window</class>
- <widget class="QMainWindow" name="group_chat_window">
+ <widget class="QWidget" name="group_chat_window">
   <property name="geometry">
    <rect>
     <x>0</x>
