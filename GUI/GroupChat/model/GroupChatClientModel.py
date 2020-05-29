@@ -2,6 +2,9 @@ import socket
 import select
 import sys
 import msvcrt
+from .CRUDtoDatabase import dbHelper
+#init db
+database_tools = dbHelper()
 
 class GroupChatClientModel:
 
@@ -15,7 +18,6 @@ class GroupChatClientModel:
     def connect(self):
         ip_address = '127.0.0.1'
         port = 8081
-
         # Input username & ID sendiri
         self.username = input("Please enter your username: ")
         your_id = input("Please enter your ID: ")
@@ -50,18 +52,17 @@ class GroupChatClientModel:
             self.server.send(message.encode())
             
         else:
+            
             message = '<group>' + message
             # print(message)
             self.server.send(message.encode())
-        
+
         sys.stdout.flush()
     
     # Function terima message dari DB
     def ready_to_read(self):
         sockets_list = [self.server]
-
         while True:
-
             read_sockets, _ , exception_sockets = select.select(sockets_list, [], sockets_list)
            
             for socks in read_sockets:
@@ -69,7 +70,7 @@ class GroupChatClientModel:
                 if socks == self.server:
                     print('masuk')
                     message = socks.recv(2048).decode()
-                    # print(message)      
+                    # print(message)  
 
     def main(self):
         username = self.connect()       

@@ -3,6 +3,9 @@ import select
 import sys
 import threading
 
+from CRUDtoDatabase import dbHelper
+#init db
+database_tools = dbHelper()
 class GroupChatServerModel:
 
     list_of_clients = []
@@ -19,6 +22,8 @@ class GroupChatServerModel:
         self.server.listen(100)
 
     def clientthread(self, conn, addr):
+        group_id_yang_dituju = 1
+        id_pengirim = 2
         while True:
             try:
                 message = conn.recv(2048).decode()
@@ -63,6 +68,8 @@ class GroupChatServerModel:
 
                 # Send message group chat
                 elif (message[:7] == '<group>'):
+                    #put ke db
+                    database_tools.insert_into("chat_message","msg,Acc_sent_id,chat_id","'{}','{}','{}'".format(message[7:],str(id_pengirim),str(group_id_yang_dituju)))
                     message_to_send = addr[2] + ':' + message[7:]
                     sender_id = str(addr[3])
                     print (addr[2] + ':' + message[7:])
@@ -83,11 +90,13 @@ class GroupChatServerModel:
         for clients, unique_id in self.room_example:
             if unique_id != sender_id:
                 try:
-                    print('broadcasted')
+                    print(clients)
                     clients.send(message.encode())
                 except:
+                    print('failed to brodcast but in try ')
                     clients.close()
                     self.remove_group(clients)
+            else: print("failed to brodcast")
 
     def remove(self, connection):
         if connection in self.list_of_clients:

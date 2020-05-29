@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from view.Ui_group_chat_window import Ui_group_chat_window
-from model.GroupChatServerModel import GroupChatServerModel
+# from model.GroupChatServerModel import GroupChatServerModel
 from model.GroupChatClientModel import GroupChatClientModel
 
 # Only needed for access to command line arguments
