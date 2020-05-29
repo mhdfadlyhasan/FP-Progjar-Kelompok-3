@@ -4,6 +4,7 @@ import sys
 import threading
 import os
 import django
+from datetime import datetime
 from dotenv import load_dotenv
 
 load_dotenv(verbose=True)
@@ -11,7 +12,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pyNet.settings')
 django.setup()
 from django.db import models
 # from django.contrib.auth.models import User
-from chat.models import Room, Room_Acc
+from chat.models import *
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -92,7 +93,11 @@ def clientthread(conn, addr):
                 broadcast(message_to_send, conn, sender_id)
 
                 #put to db
-
+                try:
+                    msg_db = Message.objects.create(room=room,msg=message[7:-1],AccSent=addr[3],getTime=datetime.now())
+                    print('success')
+                except:
+                    print('error')
             else:
                 remove(conn)
         except:
