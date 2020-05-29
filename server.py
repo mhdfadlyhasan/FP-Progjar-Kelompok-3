@@ -4,7 +4,9 @@ import sys
 import threading
 import os
 import django
+from dotenv import load_dotenv
 
+load_dotenv(verbose=True)
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pyNet.settings')
 django.setup()
 from django.db import models
