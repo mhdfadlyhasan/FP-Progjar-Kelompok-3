@@ -11,15 +11,18 @@ import io
 
 # Subclass QMainWindow to customise your application's main window
 
-# Client Connect
 username = None
-model = GroupChatClientModel()
 
 class ChatList(QMainWindow, Ui_ChatList):
 
     def __init__(self):
         super(ChatList, self).__init__()
         self.setupUi(self)
+
+        # Client Connect
+        print('here')
+        model = GroupChatClientModel()
+        username = model.connect()
         
         # Temp
         self.chat_click()
@@ -76,7 +79,6 @@ class client_thread(QThread, GroupChatClientModel):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    username = model.connect()
     window = ChatList()
     window.show()
     app.exec_()

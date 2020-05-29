@@ -14,19 +14,25 @@ class GroupChatClientModel:
     username = None
 
     def __init__(self):
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+        if self.isConnected == False:
+            self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.ip_address = '127.0.0.1'
+            self.port = 8081
+            self.server.connect((self.ip_address, self.port))
+            self.isConnected = True
+            
+        elif self.isConnected == True:
+            print('Connected to server')
+        
     def connect(self):
-        ip_address = '127.0.0.1'
-        port = 8081
+        
         # Input username & ID sendiri
         self.username = input("Please enter your username: ")
-        your_id = input("Please enter your ID: ")
-        self.server.connect((ip_address, port))
-        self.isConnected = True
+        self.your_id = input("Please enter your ID: ")
+        
 
         # Send username + id
-        packet = self.username + ',' + your_id
+        packet = self.username + ',' + self.your_id
         self.server.send(packet.encode())
 
         return self.username
@@ -35,7 +41,6 @@ class GroupChatClientModel:
     def group_chat(self):
 
         while True:
-
             sockets_list = [sys.stdin, self.server]
 
             # Tunggu input

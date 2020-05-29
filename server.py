@@ -23,6 +23,7 @@ server.listen(100)
 list_of_clients = []
 room_example = []
 unique_id = ""
+print(server)
 
 def clientthread(conn, addr):
     
@@ -46,7 +47,6 @@ def clientthread(conn, addr):
                 memb = int(addr[3])
                 member = Room_Acc.objects.create(AccID=memb, RoomID=room)
                 
-
                 # Room dummy untuk testing awal
                 room_example.append((conn, str(addr[3])))
 
@@ -148,7 +148,7 @@ while True:
     # Register id
     list_of_clients.append((conn, str(addr[3]))) 
     print (str(addr[2]) + ' has joined the chat with ID ' + str(addr[3]))
-    # print(conn)
+    print(list_of_clients)
     threading.Thread(target=clientthread, args=(conn, addr)).start()
     
 conn.close()
