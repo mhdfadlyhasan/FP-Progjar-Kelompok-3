@@ -3,6 +3,7 @@ import select
 import sys
 import msvcrt
 from .CRUDtoDatabase import dbHelper
+
 #init db
 database_tools = dbHelper()
 
@@ -31,50 +32,60 @@ class GroupChatClientModel:
         return self.username
 
     # Function terima input dari user
-    def group_chat(self, message):
-  
-        # Format <create> ID_room
-        if (message[:8] == '<create>'):
-            split = message.split(' ')
-            print ('You created a room with ID ' + split[1])
-            self.server.send(message.encode())
+    def group_chat(self):
 
-        # Format <invite> ID_user
-        elif (message[:8] == '<invite>'):
-            split = message.split(' ')
-            print ('You invited user with ID ' + split[1])
-            self.server.send(message.encode())   
-
-        # Format <join> ID_room
-        elif (message[:6] == '<join>'):
-            split = message.split(' ')
-            print ('You joined room with ID ' + split[1])
-            self.server.send(message.encode())
-            
-        else:
-            
-            message = '<group>' + message
-            # print(message)
-            self.server.send(message.encode())
-
-        sys.stdout.flush()
-    
-    # Function terima message dari DB
-    def ready_to_read(self):
-        sockets_list = [self.server]
         while True:
-            read_sockets, _ , exception_sockets = select.select(sockets_list, [], sockets_list)
-           
-            for socks in read_sockets:
+
+            sockets_list = [sys.stdin, self.server]
+
+            # Tunggu input
+            ready_to_read = select.select([self.server], [], [], 0.1)[0] #delay diperkecil biar lebih responsive
+            assert all(self.server.fileno() != -1 for server in ready_to_read)
+            if not sys.stdin.isatty():
+                temp = sys.stdin.readline()
+                if (str(temp) != ''):
+                    # print (temp)
+                    ready_to_read.append(temp)
+
+            for socks in ready_to_read:
                 # Terima message
                 if socks == self.server:
-                    print('masuk')
+                    print('receive')
                     message = socks.recv(2048).decode()
-                    # print(message)  
+                    # print(message)
+
+                else:
+                    # print(ready_to_read)
+                    message = temp
+
+                    # Format <create> ID_room
+                    if (message[:8] == '<create>'):
+                        split = message.split(' ')
+                        print ('You created a room with ID ' + split[1])
+                        self.server.send(message.encode())
+
+                    # Format <invite> ID_user
+                    elif (message[:8] == '<invite>'):
+                        split = message.split(' ')
+                        print ('You invited user with ID ' + split[1])
+                        self.server.send(message.encode())   
+
+                    # Format <join> ID_room
+                    elif (message[:6] == '<join>'):
+                        split = message.split(' ')
+                        print ('You joined room with ID ' + split[1])
+                        self.server.send(message.encode())
+                        
+                    else:
+                        message = '<group>' + message
+                        print(message)
+                        self.server.send(message.encode())
+
+                    sys.stdout.flush()
 
     def main(self):
         username = self.connect()       
-        self.ready_to_read()
+        self.group_chat()
 
 if __name__ == '__main__':
     model = GroupChatClientModel()

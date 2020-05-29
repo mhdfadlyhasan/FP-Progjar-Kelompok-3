@@ -7,15 +7,21 @@ from model.GroupChatClientModel import GroupChatClientModel
 
 # Only needed for access to command line arguments
 import sys
+import io
 
 # Subclass QMainWindow to customise your application's main window
+
+# Client Connect
+username = None
+model = GroupChatClientModel()
 
 class ChatList(QMainWindow, Ui_ChatList):
 
     def __init__(self):
         super(ChatList, self).__init__()
         self.setupUi(self)
-
+        
+        # Temp
         self.chat_click()
 
     def chat_click(self):
@@ -28,21 +34,15 @@ class GroupChatWindow(QMainWindow, Ui_group_chat_window):
         super(GroupChatWindow, self).__init__()
         self.setupUi(self)
 
-        self.model = GroupChatClientModel()
-        self.username = None
-
-        # Client Connect
-        self.username = self.model.connect()
-
         # Panggil function untuk start thread
-        self.receive_function()
+        self.client_run()
 
-        # Jika list item di click
+        # When list item is clicked
         self.input.returnPressed.connect(self.message_input)
 
     # Custom Functions
-    def receive_function(self):
-        self.thread = receive_message(self)
+    def client_run(self):
+        self.thread = client_thread(self)
         self.thread.start()
 
     # Detect Message Input
@@ -55,29 +55,28 @@ class GroupChatWindow(QMainWindow, Ui_group_chat_window):
         if (message[0] == '<'):
             pass
         else:
-            self.message_list.append(str(self.username) + ': ' + str(message))
+            self.message_list.append(str(username) + ': ' + str(message))
         
-        # Send message ke server setelah diproses di client model
-        self.model.group_chat(message)    
-
-    
-        
+        # Send message ke thread client
+        sys.stdin = io.StringIO(message) 
+        # model.stdinprint()
 
 # Untuk thread ambil message dari DB
-class receive_message(QThread, GroupChatClientModel):
+class client_thread(QThread, GroupChatClientModel):
 
     def __init__(self, *args, **kwargs):
-        super(receive_message, self).__init__(*args, **kwargs)
+        super(client_thread, self).__init__(*args, **kwargs)
         self.args = args
         self.kwargs = kwargs
-        print('ready to read init')
+        print('Client running')
 
     def run(self):
-        self.ready_to_read()
+        self.group_chat()
         # print(message)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    username = model.connect()
     window = ChatList()
-    window.show() 
+    window.show()
     app.exec_()
