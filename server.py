@@ -4,7 +4,7 @@ import sys
 import threading
 import os
 import django
-from datetime import datetime
+import datetime
 from dotenv import load_dotenv
 
 load_dotenv(verbose=True)
@@ -94,7 +94,7 @@ def clientthread(conn, addr):
 
                 #put to db
                 try:
-                    msg_db = Message.objects.create(room=room,msg=message[7:-1],AccSent=addr[3],getTime=datetime.now())
+                    msg_db = Message.objects.create(room=room,msg=message[7:-1],AccSent=addr[3],getTime=datetime.datetime.now())
                     print('success')
                 except:
                     print('error')
