@@ -23,10 +23,24 @@ server.listen(100)
 list_of_clients = []
 room_example = []
 unique_id = ""
-print(server)
 
-def clientthread(conn, addr):
-    
+def clientthread(conn, addr,list_of_clients):
+    print(conn)
+    packet = conn.recv(2048).decode()
+    print (packet + " ini packet")
+    # Menambahkan username dan id ke addr
+    split = packet.split(',')
+    # print(split)
+    temp = list(addr)
+    temp.append(split[0])
+    temp.append(split[1])
+    addr = tuple(temp)
+
+        # Register id
+    list_of_clients.append((conn, str(addr[3]))) 
+    print (str(addr[2]) + ' has joined the chat with ID ' + str(addr[3]))
+    print(list_of_clients)
+    print("thread created")
     while True:
         try:
             message = conn.recv(2048).decode()
@@ -86,10 +100,10 @@ def clientthread(conn, addr):
             elif (message[:7] == '<group>'):
                 message_to_send = addr[2] + ':' + message[7:-1]
                 sender_id = str(addr[3])
-                print (addr[2] + ':' + message[7:-1])
+                print (addr[2] + ':' + message[7:])
 
                 # Code broadcast dengan room id disini
-
+                
                 # broadcast dengan room dummy
                 broadcast(message_to_send, conn, sender_id)
 
@@ -118,6 +132,7 @@ def personal_chat(message, connection, sender_id, receiver_id):
                 personal_chat(message, connection, sender_id, sender_id)
 
 def broadcast(message, connection, sender_id):
+    print("broadcasting!")
     for clients, unique_id in room_example:
         if unique_id != sender_id:
             try:
@@ -136,25 +151,7 @@ def remove_group(connection):
 
 while True:
     conn, addr = server.accept()
-    packet = conn.recv(2048).decode()
-    print (packet)
-
-    try:
-        # Menambahkan username dan id ke addr
-        split = packet.split(',')
-        # print(split)
-        temp = list(addr)
-        temp.append(split[0])
-        temp.append(split[1])
-        addr = tuple(temp)
-
-         # Register id
-        list_of_clients.append((conn, str(addr[3]))) 
-        print (str(addr[2]) + ' has joined the chat with ID ' + str(addr[3]))
-        print(list_of_clients)
-        threading.Thread(target=clientthread, args=(conn, addr)).start()
-
-    except IndexError:
-        pass
+    print("creating Thread")
+    threading.Thread(target=clientthread, args=(conn, addr,list_of_clients)).start()
 
 conn.close()
