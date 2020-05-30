@@ -45,6 +45,7 @@ def clientthread(conn, addr, list_of_clients):
     while True:
         try:
             message = conn.recv(2048).decode()
+            print('here')
 
             # Terima id orang yang akan di personal chat
             if (message[:4] == '<id>'):
@@ -61,7 +62,7 @@ def clientthread(conn, addr, list_of_clients):
                 print('join')
             # Send message group chat
             elif (message[:7] == '<group>'):
-                message_to_send = addr[2] + ':' + message[7:-1]
+                message_to_send = addr[2] + ':' + message[7:]
                 sender_id = str(addr[3])
                 print (addr[2] + ': ' + message[7:])
 
@@ -79,34 +80,39 @@ def clientthread(conn, addr, list_of_clients):
             # create rooom 
             elif (message[:8] == '<create>'):
                 split = message.split(' ')
-                # print(split[1])
+                print('masuk create')
 
                 # code create room di DB disini
-                room = Room(RoomName=split[1])
-                room.save()
+                # room = Room(RoomName=split[1])
+                # room.save()
 
-                print('Room Created with ID ' + split[1]) 
-                memb = int(addr[3])
-                member = Room_Acc.objects.create(AccID=memb, RoomID=room)
+                # print('Room Created with ID ' + split[1]) 
+                # memb = int(addr[3])
+                # member = Room_Acc.objects.create(AccID=memb, RoomID=room)
                 
                 # Room dummy untuk testing awal
                 room_example.append((conn, str(addr[3])))
+                print('Room Created with ID ' + split[1])
+                print (room_example)
+
             # invite to group
             elif (message[:8] == '<invite>'):
+                print('masuk invite')
                 split = message.split(' ')
                 invite_id = split[1]
 
                 for client in list_of_clients:
-                    if (client[1] == invite_id[:-1]):
+                    if (client[1] == invite_id):
                         print("Receiver ID: " + client[1])
                         client_conn = client[0]
-                        # print(client_conn)
+                        print(client_conn)
 
-                room_example.append((client_conn, invite_id[:-1])) 
+                room_example.append((client_conn, invite_id)) 
+                print (room_example)
             # Send message personal chat
             elif (message[:10] == '<personal>'):
-                print (addr[2] + ':' + message[10:-1])
-                message_to_send = addr[2] + ':' + message[10:-1]
+                print (addr[2] + ': ' + message[10])
+                message_to_send = addr[2] + ': ' + message[10:]
                 personal_chat(message_to_send, conn, addr[3], unique_id)
                 # db disini
             else:

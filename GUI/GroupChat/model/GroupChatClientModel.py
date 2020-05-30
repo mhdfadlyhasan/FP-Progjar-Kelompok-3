@@ -36,7 +36,7 @@ class GroupChatClientModel:
     def group_chat(self):
 
         while True:
-            sockets_list = [sys.stdin, self.server]
+            sockets_list = [self.server]
 
             # Tunggu input
             ready_to_read = select.select([self.server], [], [], 0.1)[0] #delay diperkecil biar lebih responsive
@@ -52,7 +52,7 @@ class GroupChatClientModel:
                 if socks == self.server:
                     print('receive')
                     message = socks.recv(2048).decode()
-                    # print(message)
+                    print(message)
 
                 else:
                     message = temp
