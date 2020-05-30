@@ -20,12 +20,36 @@ class ChatList(QMainWindow, Ui_ChatList):
         super(ChatList, self).__init__()
         self.setupUi(self)
 
-        # Temp
-        self.chat_click()
+        # Panggil function untuk start thread
+        self.client_run()
+
+        # Temp groupchat window
+        self.chat_list.itemActivated.connect(self.chat_click)
+
+    # Custom Functions
+    def client_run(self):
+        self.thread = client_thread(self)
+        self.thread.start()
 
     def chat_click(self):
         self.chat = GroupChatWindow()
         self.chat.show()
+
+# Untuk thread client
+class client_thread(QThread, GroupChatClientModel):
+
+    global username
+    connected = False
+
+    def __init__(self, *args, **kwargs):
+        super(client_thread, self).__init__(*args, **kwargs)
+        self.args = args
+        self.kwargs = kwargs
+        print('Client running')
+        
+    def run(self):
+        self.group_chat()
+        # print(message)
 
 class GroupChatWindow(QMainWindow, Ui_group_chat_window):
 
@@ -33,16 +57,8 @@ class GroupChatWindow(QMainWindow, Ui_group_chat_window):
         super(GroupChatWindow, self).__init__()
         self.setupUi(self)
 
-        # Panggil function untuk start thread
-        self.client_run()
-
         # When list item is clicked
         self.input.returnPressed.connect(self.message_input)
-
-    # Custom Functions
-    def client_run(self):
-        self.thread = client_thread(self)
-        self.thread.start()
 
     # Detect Message Input
     def message_input(self):
@@ -60,32 +76,8 @@ class GroupChatWindow(QMainWindow, Ui_group_chat_window):
         sys.stdin = io.StringIO(message) 
         # model.stdinprint()
 
-# Untuk thread ambil message dari DB
-class client_thread(QThread, GroupChatClientModel):
-
-    def __init__(self, *args, **kwargs):
-        super(client_thread, self).__init__(*args, **kwargs)
-        self.args = args
-        self.kwargs = kwargs
-        print('Client running')
-
-    def run(self):
-        self.group_chat()
-        # print(message)
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-
-    if isConnected == False:
-            # Client Connect
-            model = GroupChatClientModel()
-            username = model.connect()
-            print (username)
-            isConnected = True
-
-    elif isConnected == True:
-        print('Username added to server')
-
     window = ChatList()
     window.show()
     app.exec_()

@@ -24,10 +24,11 @@ list_of_clients = []
 room_example = []
 unique_id = ""
 
-def clientthread(conn, addr,list_of_clients):
-    print(conn)
+def clientthread(conn, addr, list_of_clients):
+
     packet = conn.recv(2048).decode()
-    print (packet + " ini packet")
+    # print (packet + " ini packet")
+
     # Menambahkan username dan id ke addr
     split = packet.split(',')
     # print(split)
@@ -36,17 +37,15 @@ def clientthread(conn, addr,list_of_clients):
     temp.append(split[1])
     addr = tuple(temp)
 
-        # Register id
+    # Register id
     list_of_clients.append((conn, str(addr[3]))) 
     print (str(addr[2]) + ' has joined the chat with ID ' + str(addr[3]))
-    print(list_of_clients)
-    print("thread created")
+    # print(list_of_clients)
+
     while True:
         try:
             message = conn.recv(2048).decode()
-            print ('here')
 
-            
             # Terima id orang yang akan di personal chat
             if (message[:4] == '<id>'):
                 unique_id = message[4:len(message)]
@@ -64,7 +63,7 @@ def clientthread(conn, addr,list_of_clients):
             elif (message[:7] == '<group>'):
                 message_to_send = addr[2] + ':' + message[7:-1]
                 sender_id = str(addr[3])
-                print (addr[2] + ':' + message[7:])
+                print (addr[2] + ': ' + message[7:])
 
                 # Code broadcast dengan room id disini
                 
@@ -104,7 +103,6 @@ def clientthread(conn, addr,list_of_clients):
                         # print(client_conn)
 
                 room_example.append((client_conn, invite_id[:-1])) 
-                print (room_example)
             # Send message personal chat
             elif (message[:10] == '<personal>'):
                 print (addr[2] + ':' + message[10:-1])
@@ -130,10 +128,11 @@ def personal_chat(message, connection, sender_id, receiver_id):
                 personal_chat(message, connection, sender_id, sender_id)
 
 def broadcast(message, connection, sender_id):
-    print("broadcasting!")
+    # print("broadcasting!")
     for clients, unique_id in room_example:
         if unique_id != sender_id:
             try:
+                print('here')
                 clients.send(message.encode())
             except:
                 clients.close()
@@ -149,6 +148,7 @@ def remove_group(connection):
 
 while True:
     conn, addr = server.accept()
+    
     print("creating Thread")
     threading.Thread(target=clientthread, args=(conn, addr,list_of_clients)).start()
 
