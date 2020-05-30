@@ -31,7 +31,9 @@ class LocalListWidget(QListWidget):
     def dragEnterEvent(self, e: QtGui.QDragEnterEvent) -> None:
         if e.mimeData().hasUrls():
             e.acceptProposedAction()
-        
+        else:
+            print(e.mimeData().hasText())
+
     def dropEvent(self, event: QtGui.QDropEvent) -> None:
         if event.mimeData().hasUrls():
             for url in event.mimeData().urls():
@@ -54,11 +56,14 @@ class RemoteListWidget(QListWidget):
             event.setDropAction(Qt.CopyAction)
             event.accept()
         else:
+            print(event)
             event.ignore()
 
     def dragEnterEvent(self, e: QtGui.QDragEnterEvent) -> None:
         if e.mimeData().hasUrls():
             e.acceptProposedAction()
+        else:
+            print(e.mimeData().text())
 
     def dropEvent(self, event: QtGui.QDropEvent) -> None:
         if event.mimeData().hasUrls:
@@ -104,11 +109,12 @@ class MainWindow(QMainWindow, UiFTPClient):
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-        # self.contextMenuRemote = QMenu()
         self.iconFile = QtGui.QIcon(os.path.abspath('view/icon/document-list.png'))
         self.iconDir = QtGui.QIcon(os.path.abspath('view/icon/folder.png'))
         self.client = FTPClientModel()
         self.setupUi(self)
+        self.actionExit.triggered.connect(qApp.quit)
+        self.actionAboutMe.triggered.connect(self.menu_about)
         self.remoteListWidget = RemoteListWidget(self.horizontalLayoutWidget)
         self.localListWidget = LocalListWidget(self.horizontalLayoutWidget)
         self.containerLocalDir.addWidget(self.localListWidget)
@@ -124,8 +130,25 @@ class MainWindow(QMainWindow, UiFTPClient):
         self.remoteTreeDir.itemCollapsed.connect(self.remove_collapsed_tree_remote)
         # self.remoteListWidget.customContextMenuRequested.connect(self.delete_context_menu_remote)
         # self.register_context_menu_remote()
-        self.remoteListWidget.itemChanged.connect(self.remote_list_widget_item_changed)
         self.remoteListWidget.dropped.connect(self.upload_file_to_remote)
+        self.remoteListWidget.installEventFilter(self)
+
+    def eventFilter(self, widget: QObject, event: QEvent) -> bool:
+        if event.type() == QEvent.ContextMenu and widget is self.remoteListWidget:
+            item = widget.itemAt(event.pos())
+            filename = item.text()
+            menu = QMenu()
+            downloadAction = QAction("Download", self)
+            deleteAction = QAction('Delete File Remote', self)
+            menu.addAction(downloadAction)
+            menu.addSeparator()
+            menu.addAction(deleteAction)
+            downloadAction.triggered.connect(lambda: self.download_file_from_remote(filename))
+            deleteAction.triggered.connect(lambda: self.delete_file_from_remote(filename))
+
+            menu.exec_(event.globalPos())
+            return True
+        return super(MainWindow, self).eventFilter(widget, event)
 
     def connect_slot(self):
         if not self.client.isConnected:
@@ -238,10 +261,6 @@ class MainWindow(QMainWindow, UiFTPClient):
         self.remoteListTree[self.remoteHist[-1]] = list_folders
         self.parsing_remote_list_widget(list_files)
 
-    # TODO: Context menu
-    # def register_context_menu_remote(self):
-    #     self.contextMenuRemote.addAction(delete_action(self.remoteListWidget))
-
     def parsing_remote_list_widget(self, list_files):
         self.remoteListWidget.clear()
         for file in list_files:
@@ -249,10 +268,6 @@ class MainWindow(QMainWindow, UiFTPClient):
             itemListWidget.setIcon(self.iconFile)
             itemListWidget.setText(file[0])
             self.remoteListWidget.addItem(itemListWidget)
-
-    def remote_list_widget_item_changed(self, item: QListWidgetItem):
-        # UPLOAD TO REMOTE
-        print(item.text())
 
     # Slot for itemClicked
     def parsing_folder_remote(self, item: QTreeWidgetItem, column: QColumnView):
@@ -269,6 +284,22 @@ class MainWindow(QMainWindow, UiFTPClient):
     def remove_collapsed_tree_remote(item: QTreeWidgetItem):
         item.takeChildren()
 
+    def refresh_remote_list_widget(self):
+        self.get_list_dir_remote(self.currentRemoteDir)
+        list_files= []
+        for file in self.remoteDir:
+            type_file = file[1]['type']
+            if type_file == 'file':
+                list_files.append(file)
+        self.parsing_remote_list_widget(list_files)
+
+    def delete_file_from_remote(self, filename):
+        self.client.delete_file(filename)
+        self.refresh_remote_list_widget()
+
+    def download_file_from_remote(self, filename):
+        self.client.download(filename, os.path.join(self.currentLocalDir, filename))
+
     @pyqtSlot(str)
     def upload_file_to_remote(self, url):
         if self.client.isConnected:
@@ -283,21 +314,17 @@ class MainWindow(QMainWindow, UiFTPClient):
     #         if path in parent.items():
     #             isChild = True
     #             newPath = parent + "/" + path
+    @staticmethod
+    def menu_about():
+        box = QMessageBox()
+        box.setWindowTitle("About Me")
+        box.setText("Hey there, this app created by Akwila Feliciano, for my Network Programming project.")
+        box.exec_()
 
-    def context_menu_remote_delete(self, position):
-        pass
 
-    def create_remote_menu(self):
-        pass
-
-
-# You need one (and only one) QApplication instance per application.
-# Pass in sys.argv to allow command line arguments for your app.
-# If you know you won't use command line arguments QApplication([]) works too.
 app = QApplication(sys.argv)
 
 window = MainWindow()
-window.show()  # IMPORTANT!!!!! Windows are hidden by default.
+window.show()
 
-# Start the event loop.
 app.exec_()

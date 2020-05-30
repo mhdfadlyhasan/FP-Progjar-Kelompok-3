@@ -47,8 +47,8 @@ class FTPClientModel:
         # return list_dir, files_path
         return list_dir
 
-    def download(self, item, sourceName, destPath) -> bool:
-        sourcePath = os.path.join(self.remoteCurrentPath, os.path.sep + sourceName)
+    def download(self, sourceName, destPath) -> bool:
+        sourcePath = os.path.join(self.remoteCurrentPath, sourceName)
 
         # Not tested yet
         with open(destPath, 'wb') as file:
@@ -77,6 +77,9 @@ class FTPClientModel:
     def curr_dir(self):
         return self.client.pwd()
 
+    def delete_file(self, path):
+        fullpath = os.path.join(self.remoteCurrentPath, path)
+        self.client.delete(fullpath)
 
 if __name__ == '__main__':
     client = FTPClientModel()
