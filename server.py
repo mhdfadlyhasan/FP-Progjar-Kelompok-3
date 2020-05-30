@@ -46,10 +46,38 @@ def clientthread(conn, addr,list_of_clients):
             message = conn.recv(2048).decode()
             print ('here')
 
+            
+            # Terima id orang yang akan di personal chat
+            if (message[:4] == '<id>'):
+                unique_id = message[4:len(message)]
+                print(unique_id)
+                #tunjukkan list pesan ke pengguna! list didapat dari dataase
+                message = "selamat datang, riwayat pesan anda "
+                conn.send(message.encode())
             # Client berhenti
-            if (message[:6] == '<quit>'):
+            elif (message[:6] == '<quit>'):
                 print('Client with ID ' + str(addr[3]) + ' has left the application')
+            # join (implement plls)
+            elif (message[:6] == '<join>'):
+                print('join')
+            # Send message group chat
+            elif (message[:7] == '<group>'):
+                message_to_send = addr[2] + ':' + message[7:-1]
+                sender_id = str(addr[3])
+                print (addr[2] + ':' + message[7:])
 
+                # Code broadcast dengan room id disini
+                
+                # broadcast dengan room dummy
+                broadcast(message_to_send, conn, sender_id)
+
+                # db disini
+                try:
+                    msg_db = Message.objects.create(room=room,msg=message[7:-1],AccSent=addr[3],getTime=datetime.datetime.now())
+                    print('success')
+                except:
+                    print('error')
+            # create rooom 
             elif (message[:8] == '<create>'):
                 split = message.split(' ')
                 # print(split[1])
@@ -64,7 +92,7 @@ def clientthread(conn, addr,list_of_clients):
                 
                 # Room dummy untuk testing awal
                 room_example.append((conn, str(addr[3])))
-
+            # invite to group
             elif (message[:8] == '<invite>'):
                 split = message.split(' ')
                 invite_id = split[1]
@@ -77,42 +105,12 @@ def clientthread(conn, addr,list_of_clients):
 
                 room_example.append((client_conn, invite_id[:-1])) 
                 print (room_example)
-
-            elif (message[:6] == '<join>'):
-                print('join')
-
-            # Terima id orang yang akan di personal chat
-            elif (message[:4] == '<id>'):
-                unique_id = message[4:len(message)]
-                print(unique_id)
-                #tunjukkan list pesan ke pengguna! list didapat dari dataase
-                message = "selamat datang, riwayat pesan anda "
-                conn.send(message.encode())
-
             # Send message personal chat
             elif (message[:10] == '<personal>'):
                 print (addr[2] + ':' + message[10:-1])
                 message_to_send = addr[2] + ':' + message[10:-1]
                 personal_chat(message_to_send, conn, addr[3], unique_id)
-                #put to db
-
-            # Send message personal chat
-            elif (message[:7] == '<group>'):
-                message_to_send = addr[2] + ':' + message[7:-1]
-                sender_id = str(addr[3])
-                print (addr[2] + ':' + message[7:])
-
-                # Code broadcast dengan room id disini
-                
-                # broadcast dengan room dummy
-                broadcast(message_to_send, conn, sender_id)
-
-                #put to db
-                try:
-                    msg_db = Message.objects.create(room=room,msg=message[7:-1],AccSent=addr[3],getTime=datetime.datetime.now())
-                    print('success')
-                except:
-                    print('error')
+                # db disini
             else:
                 remove(conn)
         except:
