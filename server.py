@@ -30,6 +30,7 @@ def clientthread(conn, addr):
     while True:
         try:
             message = conn.recv(2048).decode()
+            print ('here')
 
             # Client berhenti
             if (message[:6] == '<quit>'):
@@ -136,19 +137,24 @@ def remove_group(connection):
 while True:
     conn, addr = server.accept()
     packet = conn.recv(2048).decode()
+    print (packet)
 
-    # Menambahkan username dan id ke addr
-    split = packet.split(',')
-    # print(split)
-    temp = list(addr)
-    temp.append(split[0])
-    temp.append(split[1])
-    addr = tuple(temp)
+    try:
+        # Menambahkan username dan id ke addr
+        split = packet.split(',')
+        # print(split)
+        temp = list(addr)
+        temp.append(split[0])
+        temp.append(split[1])
+        addr = tuple(temp)
 
-    # Register id
-    list_of_clients.append((conn, str(addr[3]))) 
-    print (str(addr[2]) + ' has joined the chat with ID ' + str(addr[3]))
-    print(list_of_clients)
-    threading.Thread(target=clientthread, args=(conn, addr)).start()
-    
+         # Register id
+        list_of_clients.append((conn, str(addr[3]))) 
+        print (str(addr[2]) + ' has joined the chat with ID ' + str(addr[3]))
+        print(list_of_clients)
+        threading.Thread(target=clientthread, args=(conn, addr)).start()
+
+    except IndexError:
+        pass
+
 conn.close()

@@ -29,8 +29,7 @@ class GroupChatClientModel:
         # Input username & ID sendiri
         self.username = input("Please enter your username: ")
         self.your_id = input("Please enter your ID: ")
-        
-
+    
         # Send username + id
         packet = self.username + ',' + self.your_id
         self.server.send(packet.encode())
@@ -60,7 +59,6 @@ class GroupChatClientModel:
                     # print(message)
 
                 else:
-                    # print(ready_to_read)
                     message = temp
 
                     # Format <create> ID_room
@@ -87,12 +85,4 @@ class GroupChatClientModel:
                         self.server.send(message.encode())
 
                     sys.stdout.flush()
-
-    def main(self):
-        username = self.connect()       
-        self.group_chat()
-
-if __name__ == '__main__':
-    model = GroupChatClientModel()
-    model.main()
         

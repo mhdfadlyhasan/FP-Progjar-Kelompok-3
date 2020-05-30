@@ -12,6 +12,7 @@ import io
 # Subclass QMainWindow to customise your application's main window
 
 username = None
+isConnected = False
 
 class ChatList(QMainWindow, Ui_ChatList):
 
@@ -19,11 +20,6 @@ class ChatList(QMainWindow, Ui_ChatList):
         super(ChatList, self).__init__()
         self.setupUi(self)
 
-        # Client Connect
-        print('here')
-        model = GroupChatClientModel()
-        username = model.connect()
-        
         # Temp
         self.chat_click()
 
@@ -79,6 +75,17 @@ class client_thread(QThread, GroupChatClientModel):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+
+    if isConnected == False:
+            # Client Connect
+            model = GroupChatClientModel()
+            username = model.connect()
+            print (username)
+            isConnected = True
+
+    elif isConnected == True:
+        print('Username added to server')
+
     window = ChatList()
     window.show()
     app.exec_()
