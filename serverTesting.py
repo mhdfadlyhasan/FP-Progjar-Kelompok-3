@@ -70,12 +70,13 @@ def clientthread(conn, addr, list_of_clients):
                     room = Room.objects.get(RoomName=split[1])
                     print("done!")
                     print(room)
-                    room_example.append((conn, str(addr[3])))
-                    print("appending to list!")
+                    # room_example.append((conn, str(addr[3])))
+                    # print("appending to list!")
                 except:
                     print("gagal room")
             # Send message group chat
             elif (message[:7] == '<group>'):
+
                 print("message!" +message)
                 message_to_send = addr[2] + ':' + message[7:]
                 sender_id = str(addr[3])
@@ -90,12 +91,13 @@ def clientthread(conn, addr, list_of_clients):
                 msg_user = User.objects.get(pk=addr[3])
                 
                 print("ini user " + str(msg_user))
-                msg_db = Message.objects.create(room=room,msg=message[7:],AccSent=msg_user,getTime=datetime.datetime.now())
                 try:
+                    msg_db = Message.objects.create(room=room,msg=message[7:],AccSent=msg_user,getTime=datetime.datetime.now())
                     print('success')
                 except:
                     print('error')
-            
+
+
             # create rooom 
             elif (message[:8] == '<create>'):
                 split = message.split(',')
@@ -135,14 +137,14 @@ def clientthread(conn, addr, list_of_clients):
                         except :
                             print('error')
 
-                room_example.append((client_conn, invite_id)) 
-                print (room_example)
+                # room_example.append((client_conn, invite_id)) 
+                # print (room_example)
 
             elif (message[:9] == '<history>'):
                 split = message.split(' ')
                 print("requested history!")
                 print(split[1])#ini id group
-                room = Room.objects.get(id='1')
+                room = Room.objects.get(id='7')
                 print("room didapat")
                 print(str(room))
                 history_pesan=" "
@@ -168,14 +170,18 @@ def clientthread(conn, addr, list_of_clients):
                 split = message.split(' ')
                 print("requested list room seorang user!!")
                 print(split[1])#ini id group
-                rooms = Room_Acc.objects.filter(AccID=split[1])
-                print("list room seorang user didapat")
-                print(str(rooms))
-                list_room=""
                 try:
-                    for messg in rooms:
-                        list_room+= str(messg.RoomID) + "\n"
-                    conn.send(list_room.encode())
+                    rooms = Room_Acc.objects.filter(AccID=split[1])
+                    print("list room seorang user didapat")
+                    print(str(rooms))
+                    list_room=""
+                    try:
+                        for messg in rooms:
+                            list_room+= str(messg.RoomID) + "\n"
+                        conn.send(list_room.encode())
+                    except:
+                        print("gagal!")
+                        conn.send(list_room.encode())
                 except:
                     print("gagal!")
                     conn.send(list_room.encode())
