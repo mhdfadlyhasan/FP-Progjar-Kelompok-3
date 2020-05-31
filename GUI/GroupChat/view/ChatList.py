@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ChatList.ui'
+# Form implementation generated from reading ui file 'chatlist.ui'
 #
 # Created by: PyQt5 UI code generator 5.13.0
 #
@@ -18,8 +18,8 @@ class Ui_ChatList(object):
         self.verticalLayout.setObjectName("verticalLayout")
         self.chat_list = QtWidgets.QListWidget(self.centralwidget)
         self.chat_list.setObjectName("chat_list")
-        self.item = QtWidgets.QListWidgetItem()
-        self.chat_list.addItem(self.item)
+        item = QtWidgets.QListWidgetItem()
+        self.chat_list.addItem(item)
         self.verticalLayout.addWidget(self.chat_list)
         self.personal_chat = QtWidgets.QPushButton(self.centralwidget)
         self.personal_chat.setObjectName("personal_chat")
@@ -27,6 +27,9 @@ class Ui_ChatList(object):
         self.create_group = QtWidgets.QPushButton(self.centralwidget)
         self.create_group.setObjectName("create_group")
         self.verticalLayout.addWidget(self.create_group)
+        self.join_group = QtWidgets.QPushButton(self.centralwidget)
+        self.join_group.setObjectName("join_group")
+        self.verticalLayout.addWidget(self.join_group)
         ChatList.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(ChatList)
         self.statusbar.setObjectName("statusbar")
@@ -45,3 +48,4 @@ class Ui_ChatList(object):
         self.chat_list.setSortingEnabled(__sortingEnabled)
         self.personal_chat.setText(_translate("ChatList", "Personal Chat"))
         self.create_group.setText(_translate("ChatList", "Create Group"))
+        self.join_group.setText(_translate("ChatList", "Join Group"))
