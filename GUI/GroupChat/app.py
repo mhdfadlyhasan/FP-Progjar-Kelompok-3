@@ -25,10 +25,21 @@ class ChatList(QMainWindow, Ui_ChatList):
         connection.server.send(("<roomlist> " + connection.your_id).encode())
         print("sending all room details!!!")
         message = connection.server.recv(2048).decode()
-        print(message)
+        count = message.count(',')
+        print(count)
+
+        # List for roomlist
+        split = message.split(',')
+
+        for room in split:
+            # Add item
+            if room != '':
+                item = QListWidgetItem()
+                item.setText(room)
+                self.chat_list.addItem(item)
 
         # Listener click list widget item
-        self.chat_list.itemActivated.connect(self.item_click)
+        self.chat_list.itemClicked.connect(self.item_click)
 
         # Listener click create group
         self.create_group.clicked.connect(self.create_group_click)
@@ -39,7 +50,8 @@ class ChatList(QMainWindow, Ui_ChatList):
         self.thread.start()
 
     def item_click(self):
-        chat_room_sekarang = '1'
+        roomname = self.chat_list.currentItem().text()
+        chat_room_sekarang = roomname[13:-1]
         connection.current_chat_room = chat_room_sekarang
         self.chat = GroupChatWindow(chat_room_sekarang)#ini harusnya diisi dengan nilai room yang barusan di click
         self.chat.show()
@@ -94,7 +106,7 @@ class GroupChatWindow(QMainWindow, Ui_group_chat_window):
         print("sended!!")
         message = connection.server.recv(2048).decode()
         self.message_list.append(message)
-        connection
+
         # Listener click list widget item
         self.invite.clicked.connect(self.invite_click)
 

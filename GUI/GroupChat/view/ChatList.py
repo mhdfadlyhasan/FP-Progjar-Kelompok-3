@@ -18,8 +18,6 @@ class Ui_ChatList(object):
         self.verticalLayout.setObjectName("verticalLayout")
         self.chat_list = QtWidgets.QListWidget(self.centralwidget)
         self.chat_list.setObjectName("chat_list")
-        item = QtWidgets.QListWidgetItem()
-        self.chat_list.addItem(item)
         self.verticalLayout.addWidget(self.chat_list)
         self.personal_chat = QtWidgets.QPushButton(self.centralwidget)
         self.personal_chat.setObjectName("personal_chat")
@@ -38,13 +36,12 @@ class Ui_ChatList(object):
         self.retranslateUi(ChatList)
         QtCore.QMetaObject.connectSlotsByName(ChatList)
 
+
     def retranslateUi(self, ChatList):
         _translate = QtCore.QCoreApplication.translate
         ChatList.setWindowTitle(_translate("ChatList", "Chat List"))
         __sortingEnabled = self.chat_list.isSortingEnabled()
         self.chat_list.setSortingEnabled(False)
-        item = self.chat_list.item(0)
-        item.setText(_translate("ChatList", "List_Item"))
         self.chat_list.setSortingEnabled(__sortingEnabled)
         self.personal_chat.setText(_translate("ChatList", "Personal Chat"))
         self.create_group.setText(_translate("ChatList", "Create Group"))

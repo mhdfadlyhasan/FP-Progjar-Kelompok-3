@@ -144,7 +144,7 @@ def clientthread(conn, addr, list_of_clients):
                 split = message.split(' ')
                 print("requested history!")
                 print(split[1])#ini id group
-                room = Room.objects.get(id='7')
+                room = Room.objects.get(id='1')
                 print("room didapat")
                 print(str(room))
                 history_pesan=" "
@@ -173,11 +173,12 @@ def clientthread(conn, addr, list_of_clients):
                 try:
                     rooms = Room_Acc.objects.filter(AccID=split[1])
                     print("list room seorang user didapat")
-                    print(str(rooms))
-                    list_room=" "
+                    # print(str(rooms))
+                    list_room=""
                     try:
                         for messg in rooms:
-                            list_room+= str(messg.RoomID) + "\n"
+                            list_room+= str(messg.RoomID) + ","
+
                         conn.send(list_room.encode())
                     except:
                         print("gagal!")
