@@ -156,9 +156,7 @@ def clientthread(conn, addr, list_of_clients):
                     conn.send(history_pesan.encode())
                 except:
                     conn.send(history_pesan.encode())
-                    print("pesan is empty!")
-                
-            
+                room_example.append((conn, str(addr[3])))
 
             # Send message personal chat
             elif (message[:10] == '<personal>'):
@@ -166,21 +164,21 @@ def clientthread(conn, addr, list_of_clients):
                 message_to_send = addr[2] + ': ' + message[10:]
                 personal_chat(message_to_send, conn, addr[3], unique_id)
                 # db disini
-            elif (message[:10] == '<room list>'):
+            elif (message[:10] == '<roomlist>'):
                 split = message.split(' ')
-                print("requested list room!!")
+                print("requested list room seorang user!!")
                 print(split[1])#ini id group
-                room = Room_Acc.objects.get(AccID=split[1])
-                print("room didapat")
-                print(str(room))
-                pesan = Message.objects.filter(room=room)
-                history_pesan=""
-                for messg in pesan:
-                    sender = str(messg.AccSent)
-                    history_pesan+= sender+": " + str(messg.msg) + "\n"
-                history_pesan = history_pesan[:-1]
-                conn.send(history_pesan.encode())
-
+                rooms = Room_Acc.objects.filter(AccID=split[1])
+                print("list room seorang user didapat")
+                print(str(rooms))
+                list_room=""
+                try:
+                    for messg in rooms:
+                        list_room+= str(messg.RoomID) + "\n"
+                    conn.send(list_room.encode())
+                except:
+                    print("gagal!")
+                    conn.send(list_room.encode())
             else:
                 remove(conn)
         except:

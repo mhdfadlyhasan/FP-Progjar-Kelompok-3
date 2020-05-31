@@ -22,6 +22,11 @@ class ChatList(QMainWindow, Ui_ChatList):
         # Panggil function untuk start thread
         self.client_run(connection)
         
+        connection.server.send(("<roomlist> " + connection.your_id).encode())
+        print("sending all room details!!!")
+        message = connection.server.recv(2048).decode()
+        print(message)
+
         # Listener click list widget item
         self.chat_list.itemActivated.connect(self.item_click)
 
