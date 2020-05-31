@@ -22,18 +22,27 @@ class ChatList(QMainWindow, Ui_ChatList):
         # Panggil function untuk start thread
         self.client_run(connection)
         
-        # Temp groupchat window
-        self.chat_list.itemActivated.connect(self.chat_click)
-        #list semua room disini?
+        # Listener click list widget item
+        self.chat_list.itemActivated.connect(self.item_click)
+
+        # Listener click create group
+        self.create_group.clicked.connect(self.create_group_click)
 
     # Custom Functions
     def client_run(self,connection):
         self.thread = client_thread(self)
         self.thread.start()
 
-    def chat_click(self):
+    def item_click(self):
         self.chat = GroupChatWindow('1')#ini harusnya diisi dengan nilai room yang barusan di click
         self.chat.show()
+
+    def create_group_click(self):
+        message, result = QInputDialog.getText(self, 'Room Name', 'Please enter the room name:')
+        if result == True:
+            message = '<create>,' + message
+            sys.stdin = io.StringIO(message)
+            print(message)
 
 # Untuk thread client
 class client_thread(QThread):
@@ -63,8 +72,6 @@ class client_thread_get(QThread):
         while True:
             connection.group_chat_get_message(1,self.object_gui)#ini juga harus disamaain id room sekarang
             
-            
-
 class GroupChatWindow(QMainWindow, Ui_group_chat_window):
 
     def __init__(self,room_id):
@@ -83,11 +90,10 @@ class GroupChatWindow(QMainWindow, Ui_group_chat_window):
 
         #maybe nambah thread disini idk :/
         self.client_run(connection,self)
+
     def client_run(self,connection,object_gui):
         self.thread = client_thread_get(connection,object_gui)
         self.thread.start()
-
-        
 
     # Detect Message Input
     def message_input(self):
@@ -103,6 +109,7 @@ class GroupChatWindow(QMainWindow, Ui_group_chat_window):
         
         # Send message ke thread client
         sys.stdin = io.StringIO(message) 
+
         # model.stdinprint()
 
 if __name__ == "__main__":

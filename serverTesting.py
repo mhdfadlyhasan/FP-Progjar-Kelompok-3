@@ -98,7 +98,7 @@ def clientthread(conn, addr, list_of_clients):
             
             # create rooom 
             elif (message[:8] == '<create>'):
-                split = message.split(' ')
+                split = message.split(',')
                 print('masuk create')
 
                 # code create room di DB disini

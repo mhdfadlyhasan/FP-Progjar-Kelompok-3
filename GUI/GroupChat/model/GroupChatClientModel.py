@@ -59,7 +59,7 @@ class GroupChatClientModel:
 
                     # Format <create> ID_room
                     if (message[:8] == '<create>'):
-                        split = message.split(' ')
+                        split = message.split(',')
                         print ('You created a room with ID ' + split[1])
                         self.server.send(message.encode())
 
