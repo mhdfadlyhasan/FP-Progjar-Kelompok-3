@@ -29,7 +29,7 @@ class GroupChatClientModel:
             packet = self.username + ',' + self.your_id
             self.server.send(packet.encode())
 
-        elif connected == True:
+        elif self.connected == True:
             print('Connected to server')
 
     # Function terima input dari user

@@ -11,7 +11,7 @@ load_dotenv(verbose=True)
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pyNet.settings')
 django.setup()
 from django.db import models
-# from django.contrib.auth.models import User
+from django.contrib.auth.models import User
 from chat.models import *
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -41,8 +41,9 @@ def clientthread(conn, addr, list_of_clients):
     list_of_clients.append((conn, str(addr[3]))) 
     print (str(addr[2]) + ' has joined the chat with ID ' + str(addr[3]))
     # print(list_of_clients)
-
+    room = 0
     while True:
+        print(room)
         try:
             message = conn.recv(2048).decode()
             print('here')
@@ -60,21 +61,37 @@ def clientthread(conn, addr, list_of_clients):
             # join (implement plls)
             elif (message[:6] == '<join>'):
                 print('join')
+                split = message.split(' ')
+                print('masuk create coba edit')
+                print(split[1])
+                # code create room di DB disini
+                try:
+                    print("try get room")
+                    room = Room.objects.get(RoomName=split[1])
+                    print("done!")
+                    print(room)
+                    room_example.append((conn, str(addr[3])))
+                    print("appending to list!")
+                except:
+                    print("gagal room")
             # Send message group chat
             elif (message[:7] == '<group>'):
+                print("message!" +message)
                 message_to_send = addr[2] + ':' + message[7:]
                 sender_id = str(addr[3])
                 print (addr[2] + ': ' + message[7:])
-
                 # Code broadcast dengan room id disini
                 
                 # broadcast dengan room dummy
                 broadcast(message_to_send, conn, sender_id)
-
                 # db disini
+                print("simpan ke db")
+                print("ini room " + str(room))
+                msg_user = User.objects.get(pk=addr[3])
+                
+                print("ini user " + str(msg_user))
+                msg_db = Message.objects.create(room=room,msg=message[7:],AccSent=msg_user,getTime=datetime.datetime.now())
                 try:
-                    msg_user = User.objects.get(pk=addr[3])
-                    msg_db = Message.objects.create(room=room,msg=message[7:-1],AccSent=msg_user,getTime=datetime.datetime.now())
                     print('success')
                 except:
                     print('error')
@@ -128,6 +145,7 @@ def clientthread(conn, addr, list_of_clients):
             else:
                 remove(conn)
         except:
+            print("error in the thread! continuing")
             continue
 
 def personal_chat(message, connection, sender_id, receiver_id):
@@ -144,11 +162,10 @@ def personal_chat(message, connection, sender_id, receiver_id):
                 personal_chat(message, connection, sender_id, sender_id)
 
 def broadcast(message, connection, sender_id):
-    # print("broadcasting!")
+    print("broadcasting!")
     for clients, unique_id in room_example:
         if unique_id != sender_id:
             try:
-                # print('here')
                 clients.send(message.encode())
             except:
                 clients.close()
