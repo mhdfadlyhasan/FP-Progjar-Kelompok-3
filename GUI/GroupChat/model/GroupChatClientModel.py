@@ -12,6 +12,7 @@ class GroupChatClientModel:
     username = None
     connected = False
     list_pesan_sekarang = []
+    current_chat_room = 0
     def __init__(self):
         if self.connected == False:
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

@@ -174,7 +174,7 @@ def clientthread(conn, addr, list_of_clients):
                     rooms = Room_Acc.objects.filter(AccID=split[1])
                     print("list room seorang user didapat")
                     print(str(rooms))
-                    list_room=""
+                    list_room=" "
                     try:
                         for messg in rooms:
                             list_room+= str(messg.RoomID) + "\n"
