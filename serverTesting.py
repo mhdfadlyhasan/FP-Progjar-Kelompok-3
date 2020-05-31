@@ -95,9 +95,7 @@ def clientthread(conn, addr, list_of_clients):
                     print('success')
                 except:
                     print('error')
-            elif (message[:9] == '<history>'):
-                print("requested history!")
-                conn.send(("testing!").encode())
+            
             # create rooom 
             elif (message[:8] == '<create>'):
                 split = message.split(' ')
@@ -139,6 +137,22 @@ def clientthread(conn, addr, list_of_clients):
 
                 room_example.append((client_conn, invite_id)) 
                 print (room_example)
+
+            elif (message[:9] == '<history>'):
+                split = message.split(' ')
+                print("requested history!")
+                print(split[1])#ini id group
+                room = Room.objects.get(id='7')
+                print("room didapat")
+                print(str(room))
+                pesan = Message.objects.filter(room=room)
+                history_pesan=""
+                for messg in pesan:
+                    sender = str(messg.AccSent)
+                    history_pesan+= sender+": " + str(messg.msg) + "\n"
+                history_pesan = history_pesan[:-1]
+                conn.send(history_pesan.encode())
+                pesan[0]
             # Send message personal chat
             elif (message[:10] == '<personal>'):
                 print (addr[2] + ': ' + message[10])

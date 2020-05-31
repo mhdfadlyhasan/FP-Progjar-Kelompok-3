@@ -57,11 +57,11 @@ class client_thread_get(QThread):
     def __init__(self, connection,object_gui):
         self.object_gui = object_gui
         super(client_thread_get, self).__init__()
-        print('Client_get running args' + str(connection))
+        print('Client_get')
         
     def run(self):
         while True:
-            connection.group_chat_get_message(1,self.object_gui)
+            connection.group_chat_get_message(1,self.object_gui)#ini juga harus disamaain id room sekarang
             
             
 
@@ -79,7 +79,7 @@ class GroupChatWindow(QMainWindow, Ui_group_chat_window):
         connection.server.send(("<history> " + room_id).encode())
         print("sended!!")
         message = connection.server.recv(2048).decode()
-        print(message)
+        self.message_list.append(message)
 
         #maybe nambah thread disini idk :/
         self.client_run(connection,self)
@@ -99,7 +99,7 @@ class GroupChatWindow(QMainWindow, Ui_group_chat_window):
         if (message[0] == '<'):
             pass
         else:
-            self.message_list.append(str("You") + ': ' + str(message))
+            self.message_list.append(str(connection.username) + ': ' + str(message))
         
         # Send message ke thread client
         sys.stdin = io.StringIO(message) 
