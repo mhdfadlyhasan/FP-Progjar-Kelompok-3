@@ -142,7 +142,35 @@ def clientthread(conn, addr, list_of_clients):
                 split = message.split(' ')
                 print("requested history!")
                 print(split[1])#ini id group
-                room = Room.objects.get(id='7')
+                room = Room.objects.get(id='1')
+                print("room didapat")
+                print(str(room))
+                history_pesan=" "
+                try:
+                    pesan = Message.objects.filter(room=room)
+                    
+                    for messg in pesan:
+                        sender = str(messg.AccSent)
+                        history_pesan+= sender+": " + str(messg.msg) + "\n"
+                    if(pesan): history_pesan = history_pesan[:-1]
+                    conn.send(history_pesan.encode())
+                except:
+                    conn.send(history_pesan.encode())
+                    print("pesan is empty!")
+                
+            
+
+            # Send message personal chat
+            elif (message[:10] == '<personal>'):
+                print (addr[2] + ': ' + message[10])
+                message_to_send = addr[2] + ': ' + message[10:]
+                personal_chat(message_to_send, conn, addr[3], unique_id)
+                # db disini
+            elif (message[:10] == '<room list>'):
+                split = message.split(' ')
+                print("requested list room!!")
+                print(split[1])#ini id group
+                room = Room_Acc.objects.get(AccID=split[1])
                 print("room didapat")
                 print(str(room))
                 pesan = Message.objects.filter(room=room)
@@ -152,13 +180,7 @@ def clientthread(conn, addr, list_of_clients):
                     history_pesan+= sender+": " + str(messg.msg) + "\n"
                 history_pesan = history_pesan[:-1]
                 conn.send(history_pesan.encode())
-                pesan[0]
-            # Send message personal chat
-            elif (message[:10] == '<personal>'):
-                print (addr[2] + ': ' + message[10])
-                message_to_send = addr[2] + ': ' + message[10:]
-                personal_chat(message_to_send, conn, addr[3], unique_id)
-                # db disini
+
             else:
                 remove(conn)
         except:
