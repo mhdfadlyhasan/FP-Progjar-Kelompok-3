@@ -16,49 +16,78 @@ isConnected = False
 
 class ChatList(QMainWindow, Ui_ChatList):
 
-    def __init__(self):
+    def __init__(self,connection):
         super(ChatList, self).__init__()
         self.setupUi(self)
-
         # Panggil function untuk start thread
-        self.client_run()
-
+        self.client_run(connection)
+        
         # Temp groupchat window
         self.chat_list.itemActivated.connect(self.chat_click)
+        #list semua room disini?
 
     # Custom Functions
-    def client_run(self):
+    def client_run(self,connection):
         self.thread = client_thread(self)
         self.thread.start()
 
     def chat_click(self):
-        self.chat = GroupChatWindow()
+        self.chat = GroupChatWindow('1')#ini harusnya diisi dengan nilai room yang barusan di click
         self.chat.show()
 
 # Untuk thread client
-class client_thread(QThread, GroupChatClientModel):
+class client_thread(QThread):
 
     global username
     connected = False
 
-    def __init__(self, *args, **kwargs):
-        super(client_thread, self).__init__(*args, **kwargs)
-        self.args = args
-        self.kwargs = kwargs
-        print('Client running')
+    def __init__(self, connection):
+        super(client_thread, self).__init__()
+        print('Client running args' + str(connection))
         
     def run(self):
-        self.group_chat()
-        # print(message)
+        while True:
+            connection.group_chat()
+
+class client_thread_get(QThread):
+
+    global username
+    connected = False
+    object_gui = ""
+    def __init__(self, connection,object_gui):
+        self.object_gui = object_gui
+        super(client_thread_get, self).__init__()
+        print('Client_get running args' + str(connection))
+        
+    def run(self):
+        while True:
+            connection.group_chat_get_message(1,self.object_gui)
+            
+            
 
 class GroupChatWindow(QMainWindow, Ui_group_chat_window):
 
-    def __init__(self):
+    def __init__(self,room_id):
         super(GroupChatWindow, self).__init__()
         self.setupUi(self)
-
-        # When list item is clicked
+        print(room_id)
+        # When enter is clicked
         self.input.returnPressed.connect(self.message_input)
+        
+        #get message from db put to message_list, untuk nampilin history chat!
+        print("sending!")
+        connection.server.send(("<history> " + room_id).encode())
+        print("sended!!")
+        message = connection.server.recv(2048).decode()
+        print(message)
+
+        #maybe nambah thread disini idk :/
+        self.client_run(connection,self)
+    def client_run(self,connection,object_gui):
+        self.thread = client_thread_get(connection,object_gui)
+        self.thread.start()
+
+        
 
     # Detect Message Input
     def message_input(self):
@@ -70,7 +99,7 @@ class GroupChatWindow(QMainWindow, Ui_group_chat_window):
         if (message[0] == '<'):
             pass
         else:
-            self.message_list.append(str(username) + ': ' + str(message))
+            self.message_list.append(str("You") + ': ' + str(message))
         
         # Send message ke thread client
         sys.stdin = io.StringIO(message) 
@@ -78,6 +107,7 @@ class GroupChatWindow(QMainWindow, Ui_group_chat_window):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = ChatList()
+    connection = GroupChatClientModel()
+    window = ChatList(connection)
     window.show()
     app.exec_()

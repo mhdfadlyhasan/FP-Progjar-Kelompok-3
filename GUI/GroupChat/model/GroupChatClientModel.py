@@ -8,11 +8,10 @@ from .CRUDtoDatabase import dbHelper
 database_tools = dbHelper()
 
 class GroupChatClientModel:
-
     server = None
     username = None
     connected = False
-
+    list_pesan_sekarang = []
     def __init__(self):
         if self.connected == False:
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -35,7 +34,7 @@ class GroupChatClientModel:
     # Function terima input dari user
     def group_chat(self):
 
-        while True:
+        if True:
             sockets_list = [self.server]
 
             # Tunggu input
@@ -52,6 +51,7 @@ class GroupChatClientModel:
                 if socks == self.server:
                     print('receive')
                     message = socks.recv(2048).decode()
+                    self.list_pesan_sekarang.append(message)
                     print(message)
 
                 else:
@@ -81,4 +81,8 @@ class GroupChatClientModel:
                         self.server.send(message.encode())
 
                     sys.stdout.flush()
+    def group_chat_get_message(self,ID_room,object_gui):
         
+        if(len(self.list_pesan_sekarang)>0):#cek apakah lagi dalam chat list sekarang
+            object_gui.message_list.append(self.list_pesan_sekarang[0])
+            self.list_pesan_sekarang.pop(0)

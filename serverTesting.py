@@ -95,6 +95,9 @@ def clientthread(conn, addr, list_of_clients):
                     print('success')
                 except:
                     print('error')
+            elif (message[:9] == '<history>'):
+                print("requested history!")
+                conn.send(("testing!").encode())
             # create rooom 
             elif (message[:8] == '<create>'):
                 split = message.split(' ')
@@ -146,7 +149,7 @@ def clientthread(conn, addr, list_of_clients):
                 remove(conn)
         except:
             print("error in the thread! continuing")
-            continue
+            break
 
 def personal_chat(message, connection, sender_id, receiver_id):
     # Mencari id orang yang akan dikirimi pesan
