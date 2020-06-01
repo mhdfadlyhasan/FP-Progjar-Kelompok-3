@@ -87,8 +87,9 @@ class ChatList(QMainWindow, Ui_ChatList):
     def item_click(self):
         roomname = self.chat_list.currentItem().text()
         if(not roomname == "Empty!"): 
-            print(roomname)
-            chat_room_sekarang = roomname[13:-1]
+            index = roomname.find('.')
+            print(index)
+            chat_room_sekarang = roomname[:index]
             connection.current_chat_room = chat_room_sekarang
             self.chat = GroupChatWindow(chat_room_sekarang)#ini harusnya diisi dengan nilai room yang barusan di click
             self.chat.show()
@@ -145,7 +146,7 @@ class GroupChatWindow(QMainWindow, Ui_group_chat_window):
         super(GroupChatWindow, self).__init__()
         self.running = True
         self.setupUi(self)
-        print(room_id)
+        print(str(room_id) + "this is room id")
         # When enter is clicked
         self.input.returnPressed.connect(self.message_input)
         
