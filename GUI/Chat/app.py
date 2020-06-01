@@ -1,16 +1,16 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-from PyQt5.QtGui import *
 from view.Chat import Ui_chat_window
 from view.ChatList import Ui_ChatList
 from view.login import Ui_Login
 from view.MemberList import Ui_member
 from model.ChatClientModel import ChatClientModel
 
+from GUI.Chat.FTPClient.app import MainWindow as FTPClient
+
 # Only needed for access to command line arguments
 import sys
 import io
-import signal
 import time
 
 # Subclass QMainWindow to customise your application's main window
@@ -19,9 +19,9 @@ username = None
 isConnected = False
 connection = ChatClientModel()
 
+
 # Window untuk login
 class login(QMainWindow, Ui_Login):
-
     # Value awal username dan password
     username_value = ''
     password_value = ''
@@ -29,12 +29,18 @@ class login(QMainWindow, Ui_Login):
     def __init__(self):
         super(login, self).__init__()
         self.setupUi(self)
-
+        self.actionExit.triggered.connect(qApp.quit)
+        self.actionLaunchFTP.triggered.connect(self.launch_ftp)
+        self.ftp = FTPClient()
         # Password hidden
         self.password.setEchoMode(QLineEdit.Password)
 
         # Listener login button
         self.login.clicked.connect(self.login_clicked)
+
+    def launch_ftp(self):
+        self.ftp.show()
+
 
     # Function login button
     def login_clicked(self):
@@ -45,7 +51,7 @@ class login(QMainWindow, Ui_Login):
 
         # Jika username dan password tidak kosong
         if self.username_value != '' and self.password_value != '':
-            
+
             # Mengirim data ke client
             connection.send_login(self.username_value, self.password_value)
 
@@ -75,22 +81,22 @@ class login(QMainWindow, Ui_Login):
             message.setIcon(QMessageBox.Critical)
             message.exec_()
 
+
 # Window untuk chatlist
 class ChatList(QMainWindow, Ui_ChatList):
-
     connection = None
 
-    def __init__(self,connection):
+    def __init__(self, connection):
         super(ChatList, self).__init__()
         self.connection = connection
         self.setup_ui(self.connection)
 
-    def setup_ui(self,connection):
+    def setup_ui(self, connection):
         self.setupUi(self)
 
         # Panggil function untuk start running client thread
         self.client_run(connection)
-        
+
         # Mengambil roomlist user
         connection.server.send(("<roomlist> " + connection.your_id).encode())
         print("Getting Room list")
@@ -117,7 +123,7 @@ class ChatList(QMainWindow, Ui_ChatList):
         self.refresh.clicked.connect(self.refresh_click)
 
     # Function run untuk client thread
-    def client_run(self,connection):
+    def client_run(self, connection):
         self.thread = client_thread(self)
         self.thread.start()
 
@@ -126,8 +132,7 @@ class ChatList(QMainWindow, Ui_ChatList):
         roomname = self.chat_list.currentItem().text()
 
         # Jika sudah ada chat sebelumnya
-        if(not roomname == "Empty!"):
-
+        if (not roomname == "Empty!"):
             index = roomname.find('.')
             chat_room_sekarang = roomname[:index]
             connection.current_chat_room = chat_room_sekarang
@@ -135,11 +140,12 @@ class ChatList(QMainWindow, Ui_ChatList):
             # Membuka chat window sesuai dengan index item yang diklik
             self.chat = ChatWindow(chat_room_sekarang)
             self.chat.show()
-    
+
     # Function personal chat button
     def personal_chat_click(self):
         # Meminta input dari user
-        message, result = QInputDialog.getText(self, 'Personal Chat', 'Please enter the user\'s ID that will be invited:')
+        message, result = QInputDialog.getText(self, 'Personal Chat',
+                                               'Please enter the user\'s ID that will be invited:')
         if result is True:
             message = '<createpersonal>,' + message
             sys.stdin = io.StringIO(message)
@@ -162,54 +168,56 @@ class ChatList(QMainWindow, Ui_ChatList):
 
     # Function refresh button
     def refresh_click(self):
-            time.sleep(1)
+        time.sleep(1)
 
-            # Recreate UI
-            self.setup_ui(self.connection)
+        # Recreate UI
+        self.setup_ui(self.connection)
+
 
 # Untuk thread client
 class client_thread(QThread):
-
     global username
     connected = False
 
     def __init__(self, connection):
         super(client_thread, self).__init__()
         print('Client Running')
-        
+
     def run(self):
         while True:
             connection.chat()
         print("Main thread killed!")
+
 
 # Untuk menjalankan thread get dari client thread
 class client_thread_get(QThread):
     global username
     connected = False
     object_gui = ""
-    room_id=""
-    def __init__(self, connection,object_gui,room_id):
+    room_id = ""
+
+    def __init__(self, connection, object_gui, room_id):
         self.object_gui = object_gui
         self.room_id = room_id
         super(client_thread_get, self).__init__()
         print('Starting a new get thread!')
-        
+
     def run(self):
         while self.object_gui.running:
             try:
-                connection.chat_get_message(self.object_gui,self.room_id)
+                connection.chat_get_message(self.object_gui, self.room_id)
             except:
                 print("Closing get thread! Error occurred!")
                 break
         else:
             print("Thread closed!")
 
-# Window untuk chat        
-class ChatWindow(QMainWindow, Ui_chat_window):
 
+# Window untuk chat
+class ChatWindow(QMainWindow, Ui_chat_window):
     room_id = ''
 
-    def __init__(self,room_id):
+    def __init__(self, room_id):
         super(ChatWindow, self).__init__()
         self.running = True
         self.setupUi(self)
@@ -231,11 +239,11 @@ class ChatWindow(QMainWindow, Ui_chat_window):
         self.show_member.clicked.connect(self.member_click)
 
         # Untuk memanggil function menjalankan thread get di client
-        self.client_run(connection,self,room_id)
+        self.client_run(connection, self, room_id)
 
     # Function menjalankan thread get
-    def client_run(self,connection,object_gui,room_id):
-        self.thread = client_thread_get(connection,object_gui,room_id)
+    def client_run(self, connection, object_gui, room_id):
+        self.thread = client_thread_get(connection, object_gui, room_id)
         self.thread.start()
 
     # Function untuk mengambil input dari user
@@ -250,11 +258,12 @@ class ChatWindow(QMainWindow, Ui_chat_window):
             pass
         else:
             self.message_list.append(str(connection.username) + ':' + str(message))
-        
-        # Send message ke thread client
-        sys.stdin = io.StringIO(message) 
 
-    # Function invite button
+        # Send message ke thread client
+        sys.stdin = io.StringIO(message)
+
+        # Function invite button
+
     def invite_click(self):
         message, result = QInputDialog.getText(self, 'Invite Person', "Please enter the person's ID:")
         if result == True:
@@ -281,9 +290,10 @@ class ChatWindow(QMainWindow, Ui_chat_window):
             print("Chat window closed!")
             self.running = False
             event.accept()
-            
+
         else:
             event.ignore()
+
 
 # Untuk window menampilkan member
 class MemberWindow(QMainWindow, Ui_member):
@@ -297,6 +307,7 @@ class MemberWindow(QMainWindow, Ui_member):
                 item = QListWidgetItem()
                 item.setText(member)
                 self.member_list.addItem(item)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

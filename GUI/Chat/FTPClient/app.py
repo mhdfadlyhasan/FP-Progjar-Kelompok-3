@@ -80,6 +80,7 @@ class RemoteListWidget(QListWidget):
         else:
             event.ignore()
 
+
 # Subclass QMainWindow to customise your application's main window
 class MainWindow(QMainWindow, UiFTPClient):
     client = None
@@ -101,8 +102,9 @@ class MainWindow(QMainWindow, UiFTPClient):
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-        self.iconFile = QtGui.QIcon(os.path.abspath('view/icon/document-list.png'))
-        self.iconDir = QtGui.QIcon(os.path.abspath('view/icon/folder.png'))
+        print(os.path.abspath('FTPClient/view/icon/document-list.png'))
+        self.iconFile = QtGui.QIcon(os.path.abspath('FTPClient/view/icon/document-list.png'))
+        self.iconDir = QtGui.QIcon(os.path.abspath('FTPClient/view/icon/folder.png'))
         self.client = FTPClientModel()
         self.setupUi(self)
         self.actionExit.triggered.connect(qApp.quit)
@@ -278,7 +280,7 @@ class MainWindow(QMainWindow, UiFTPClient):
 
     def refresh_remote_list_widget(self):
         self.get_list_dir_remote(self.currentRemoteDir)
-        list_files= []
+        list_files = []
         for file in self.remoteDir:
             type_file = file[1]['type']
             if type_file == 'file':
@@ -314,9 +316,10 @@ class MainWindow(QMainWindow, UiFTPClient):
         box.exec_()
 
 
-app = QApplication(sys.argv)
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
 
-window = MainWindow()
-window.show()
+    window = MainWindow()
+    window.show()
 
-app.exec_()
+    app.exec_()
