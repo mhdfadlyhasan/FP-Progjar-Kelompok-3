@@ -10,11 +10,11 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_group_chat_window(object):
-    def setupUi(self, group_chat_window):
-        group_chat_window.setObjectName("group_chat_window")
-        group_chat_window.resize(800, 600)
-        self.centralwidget = QtWidgets.QWidget(group_chat_window)
+class Ui_chat_window(object):
+    def setupUi(self, chat_window):
+        chat_window.setObjectName("chat_window")
+        chat_window.resize(800, 600)
+        self.centralwidget = QtWidgets.QWidget(chat_window)
         self.centralwidget.setGeometry(QtCore.QRect(0, 0, 798, 571))
         self.centralwidget.setObjectName("centralwidget")
         self.show_member = QtWidgets.QPushButton(self.centralwidget)
@@ -45,17 +45,17 @@ class Ui_group_chat_window(object):
         self.input = QtWidgets.QLineEdit(self.centralwidget)
         self.input.setGeometry(QtCore.QRect(10, 540, 781, 31))
         self.input.setObjectName("input")
-        self.statusbar = QtWidgets.QStatusBar(group_chat_window)
+        self.statusbar = QtWidgets.QStatusBar(chat_window)
         self.statusbar.setGeometry(QtCore.QRect(0, 0, 3, 18))
         self.statusbar.setObjectName("statusbar")
 
-        self.retranslateUi(group_chat_window)
-        QtCore.QMetaObject.connectSlotsByName(group_chat_window)
+        self.retranslateUi(chat_window)
+        QtCore.QMetaObject.connectSlotsByName(chat_window)
 
-    def retranslateUi(self, group_chat_window):
+    def retranslateUi(self, chat_window):
         _translate = QtCore.QCoreApplication.translate
-        group_chat_window.setWindowTitle(_translate("group_chat_window", "MainWindow"))
-        self.show_member.setText(_translate("group_chat_window", "Members"))
-        self.group_name.setText(_translate("group_chat_window", "Group Name"))
-        self.file.setText(_translate("group_chat_window", "File"))
-        self.invite.setText(_translate("group_chat_window", "Invite"))
+        chat_window.setWindowTitle(_translate("chat_window", "MainWindow"))
+        self.show_member.setText(_translate("chat_window", "Members"))
+        self.group_name.setText(_translate("chat_window", "Group Name"))
+        self.file.setText(_translate("chat_window", "File"))
+        self.invite.setText(_translate("chat_window", "Invite"))

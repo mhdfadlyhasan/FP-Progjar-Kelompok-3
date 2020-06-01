@@ -1,12 +1,11 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from view.GroupChat import Ui_group_chat_window
-from view.PersonalChat import Ui_personal_chat_window
+from view.Chat import Ui_chat_window
 from view.ChatList import Ui_ChatList
 from view.login import Ui_Login
 from view.MemberList import Ui_member
-from model.GroupChatClientModel import GroupChatClientModel
+from model.ChatClientModel import ChatClientModel
 
 # Only needed for access to command line arguments
 import sys
@@ -18,7 +17,7 @@ import time
 
 username = None
 isConnected = False
-connection = GroupChatClientModel()
+connection = ChatClientModel()
 
 # Window untuk login
 class login(QMainWindow, Ui_Login):
@@ -34,9 +33,10 @@ class login(QMainWindow, Ui_Login):
         # Password hidden
         self.password.setEchoMode(QLineEdit.Password)
 
-        # Detect input
+        # Listener login button
         self.login.clicked.connect(self.login_clicked)
 
+    # Function login button
     def login_clicked(self):
 
         # Memasukkan username dan password yang sudah diisikan
@@ -179,7 +179,7 @@ class client_thread(QThread):
         
     def run(self):
         while True:
-            connection.group_chat()
+            connection.chat()
         print("Main thread killed!")
 
 # Untuk menjalankan thread get dari client thread
@@ -197,7 +197,7 @@ class client_thread_get(QThread):
     def run(self):
         while self.object_gui.running:
             try:
-                connection.group_chat_get_message(self.object_gui,self.room_id)
+                connection.chat_get_message(self.object_gui,self.room_id)
             except:
                 print("Closing get thread! Error occurred!")
                 break
@@ -205,7 +205,7 @@ class client_thread_get(QThread):
             print("Thread closed!")
 
 # Window untuk chat        
-class ChatWindow(QMainWindow, Ui_group_chat_window):
+class ChatWindow(QMainWindow, Ui_chat_window):
 
     room_id = ''
 
@@ -249,7 +249,7 @@ class ChatWindow(QMainWindow, Ui_group_chat_window):
         if (message[0] == '<'):
             pass
         else:
-            self.message_list.append(str(connection.username) + ': ' + str(message))
+            self.message_list.append(str(connection.username) + ':' + str(message))
         
         # Send message ke thread client
         sys.stdin = io.StringIO(message) 
@@ -277,9 +277,11 @@ class ChatWindow(QMainWindow, Ui_group_chat_window):
     # Close Window Chat
     def closeEvent(self, event):
         if True:
+            time.sleep(0.2)
             print("Chat window closed!")
             self.running = False
             event.accept()
+            
         else:
             event.ignore()
 

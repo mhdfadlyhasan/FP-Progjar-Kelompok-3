@@ -1,12 +1,8 @@
 import socket
 import select
 import sys
-# from .CRUDtoDatabase import dbHelper
 
-# #init db
-# database_tools = dbHelper()
-
-class GroupChatClientModel:
+class ChatClientModel:
     server = None
     username = ''
     password = ''
@@ -16,6 +12,7 @@ class GroupChatClientModel:
     current_chat_room = 0
 
     def __init__(self):
+        # Connect ke server
         if self.connected == False:
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.ip_address = '127.0.0.1'
@@ -23,26 +20,18 @@ class GroupChatClientModel:
             self.server.connect((self.ip_address, self.port))
             self.connected = True
 
-            # # Input username & ID sendiri
-            # self.username = input("Please enter your username: ")
-            # self.your_id = input("Please enter your ID: ")
-        
-            # # Send username + id
-            # packet = self.username + ',' + self.your_id
-            # self.server.send(packet.encode())
-
         elif self.connected == True:
             print('Connected to server')
 
-    # Send login input
+    # Send login ke server
     def send_login(self, username, password):
         self.username = username
         self.password = password
         packet = self.username + ',' + self.password
         self.server.send(packet.encode())
 
-    # Function terima input dari user
-    def group_chat(self):
+    # Function utama chat di client
+    def chat(self):
 
         if True:
             sockets_list = [self.server]
@@ -50,70 +39,71 @@ class GroupChatClientModel:
             # Tunggu input
             ready_to_read = select.select([self.server], [], [], 0.1)[0] #delay diperkecil biar lebih responsive
             assert all(self.server.fileno() != -1 for server in ready_to_read)
+            # Jika stdin tidak kosong
             if not sys.stdin.isatty():
                 temp = sys.stdin.readline()
                 if (str(temp) != ''):
-                    # print (temp)
                     ready_to_read.append(temp)
 
             for socks in ready_to_read:
                 # Terima message
                 if socks == self.server:
-                    print('receive')
+                    print('Received a message')
                     message = socks.recv(2048).decode()
 
-                    # testing: follow up <createpersonal>
-                    # sorry if broke the whole program
+                    # Jika personal chat ID
                     if (message[:16] == '<personalroomid>'):
                         split = message.split(',')
                         self.current_chat_room = split[1]
-                        print ('Room ID is yes ' + str(self.current_chat_room))
+
+                    # Menempelkan pesan di list pesan
                     else:
                         self.list_pesan_sekarang.append(message)
-                        print(message)
 
+                # Kirim message
                 else:
                     message = temp
-                    # Format <create> ID_room
+
+                    # Jika create group
                     if (message[:8] == '<create>'):
                         split = message.split(',')
                         print ('You created a room with name ' + split[1])
                         self.server.send(message.encode())
 
-                    # testing: Format <createpersonal> ID_user
+                    # Jika membuat personal chat
                     elif (message[:16] == '<createpersonal>'):
                         split = message.split(',')
                         print ('You created a room with ID ' + split[1])
                         self.server.send(message.encode())
 
-                    # Format <invite> ID_user
+                    # Jika melakukan invite 
                     elif (message[:8] == '<invite>'):
                         split = message.split(' ')
                         print ('You invited user with ID ' + split[1])
                         self.server.send(message.encode())   
 
-                    # Format <join> ID_room
-                    elif (message[:6] == '<join>'):
-                        split = message.split(' ')
-                        print ('You joined room with ID ' + split[1])
-                        self.server.send(message.encode())
-
+                    # Jika menekan tombol member
                     elif (message[:8] == '<member>'):
                         split = message.split(' ')
                         print ('You requested member list from room ' + split[1])
                         self.server.send(message.encode())
 
+                    # Kirim message biasa
                     else:
-                        message = '<group>' + message
-                        print(message)
+                        message = '<chats>' + message
                         self.server.send(message.encode())
 
                     sys.stdout.flush()
-    def group_chat_get_message(self,object_gui,room_id):
+
+    # Untuk get message
+    def chat_get_message(self,object_gui,room_id):
         
-        if(len(self.list_pesan_sekarang)>0):#cek apakah lagi dalam chat list sekarang
+        # Mengecek apakah terdapat list pesan saat ini
+        if(len(self.list_pesan_sekarang)>0):
             
             pesan = self.list_pesan_sekarang[0].split("<idroom>")
             if(int(pesan[1])==int(room_id)):
+                # Menaruh pesan pada GUI
                 object_gui.message_list.append(pesan[0])
+
             self.list_pesan_sekarang.pop(0)
