@@ -98,6 +98,11 @@ class GroupChatClientModel:
                         print ('You joined room with ID ' + split[1])
                         self.server.send(message.encode())
 
+                    elif (message[:8] == '<member>'):
+                        split = message.split(' ')
+                        print ('You requested member list from room ' + split[1])
+                        self.server.send(message.encode())
+
                     else:
                         message = '<group>' + message
                         print(message)

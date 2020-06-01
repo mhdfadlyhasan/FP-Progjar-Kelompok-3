@@ -192,18 +192,12 @@ def clientthread(conn, addr, list_of_clients):
                         sender = str(messg.AccSent)
                         history_pesan+= sender+": " + str(messg.msg) + "\n"
                     if(pesan): history_pesan = history_pesan[:-1]
-                    else: conn.send("begin your chat now!".encode())
+                    else: conn.send("Begin your chat now!".encode())
                     conn.send(history_pesan.encode())
                 except:
                     conn.send(history_pesan.encode())
                 if((conn, str(addr[3])) not in room_example):
                     room_example.append((conn, str(addr[3])))
-            # Send message personal chat
-            elif (message[:10] == '<personal>'):
-                print (addr[2] + ': ' + message[10])
-                message_to_send = addr[2] + ': ' + message[10:]
-                personal_chat(message_to_send, conn, addr[3], unique_id)
-                # db disini
             elif (message[:10] == '<roomlist>'):
                 split = message.split(' ')
                 print("requested list room seorang user!!")
@@ -224,14 +218,17 @@ def clientthread(conn, addr, list_of_clients):
                     print("gagal mendapatkan room!")
                     conn.send(list_room.encode())
 
-            #testing room member
-            # elif (message[:8] == '<member>'):
-            #     split = message.split(' ')
-            #     roomid = int(split[1])
-            #     room = Room.objects.get(pk=roomid)
-            #     members = Room_Acc.objects.filter(RoomID=room)
-            #     for member in members:
-            #         print(member.AccID.username)
+            # Request room member
+            elif (message[:8] == '<member>'):
+                split = message.split(' ')
+                roomid = int(split[1])
+                room = Room.objects.get(pk=roomid)
+                members = Room_Acc.objects.filter(RoomID=room)
+                member_list = ''
+                for member in members:
+                    member_list += member.AccID.username + ','
+                
+                conn.send(member_list.encode())
 
             else:
                 print("pesan kosong")

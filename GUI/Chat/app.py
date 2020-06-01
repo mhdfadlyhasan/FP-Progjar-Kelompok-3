@@ -5,9 +5,8 @@ from view.GroupChat import Ui_group_chat_window
 from view.PersonalChat import Ui_personal_chat_window
 from view.ChatList import Ui_ChatList
 from view.login import Ui_Login
+from view.MemberList import Ui_member
 from model.GroupChatClientModel import GroupChatClientModel
-
-import time
 
 # Only needed for access to command line arguments
 import sys
@@ -107,7 +106,7 @@ class ChatList(QMainWindow, Ui_ChatList):
             print(index)
             chat_room_sekarang = roomname[:index]
             connection.current_chat_room = chat_room_sekarang
-            self.chat = GroupChatWindow(chat_room_sekarang)#ini harusnya diisi dengan nilai room yang barusan di click
+            self.chat = ChatWindow(chat_room_sekarang)#ini harusnya diisi dengan nilai room yang barusan di click
             self.chat.show()
     
     def personal_chat_click(self):
@@ -118,11 +117,8 @@ class ChatList(QMainWindow, Ui_ChatList):
             print(message)
             time.sleep(1)
 
-            # pass room ID here
-            print(connection.current_chat_room)
-            self.personal_chat = PersonalChatWindow(str(connection.current_chat_room))
-            self.personal_chat.show()
-
+            # Recreate UI
+            self.setup_ui(self.connection)
 
     def create_group_click(self):
         message, result = QInputDialog.getText(self, 'Room Name', 'Please enter the room name:')
@@ -178,25 +174,31 @@ class client_thread_get(QThread):
             print("thread closed!")
         
             
-class GroupChatWindow(QMainWindow, Ui_group_chat_window):
+class ChatWindow(QMainWindow, Ui_group_chat_window):
+
+    room_id = ''
 
     def __init__(self,room_id):
-        super(GroupChatWindow, self).__init__()
+        super(ChatWindow, self).__init__()
         self.running = True
         self.setupUi(self)
-        print(str(room_id) + "this is room id")
+        self.room_id = room_id
+        print(str(self.room_id) + "this is room id")
         # When enter is clicked
         self.input.returnPressed.connect(self.message_input)
         
         #get message from db put to message_list, untuk nampilin history chat!
         print("sending!")
-        connection.server.send(("<history> " + room_id).encode())
+        connection.server.send(("<history> " + self.room_id).encode())
         print("sended!!")
         message = connection.server.recv(2048).decode()
         self.message_list.append(message)
 
-        # Listener click list widget item
+        # Listener click invite
         self.invite.clicked.connect(self.invite_click)
+
+        # Listener click member
+        self.show_member.clicked.connect(self.member_click)
 
         # nambah thread disini
         self.client_run(connection,self,room_id)
@@ -227,6 +229,20 @@ class GroupChatWindow(QMainWindow, Ui_group_chat_window):
             sys.stdin = io.StringIO(message)
             print(message)
 
+    def member_click(self):
+        message = '<member> ' + self.room_id
+        sys.stdin = io.StringIO(message)
+        response = connection.server.recv(2048).decode()
+        count = response.count(',')
+        print(count)
+
+        # List for roomlist
+        split = response.split(',')
+
+        # Panggil Member Window
+        self.member_window = MemberWindow(split)
+        self.member_window.show()
+
     def closeEvent(self, event):
         # do stuff
         if True:
@@ -236,6 +252,18 @@ class GroupChatWindow(QMainWindow, Ui_group_chat_window):
         else:
             event.ignore()
 
+class MemberWindow(QMainWindow, Ui_member):
+    def __init__(self, split):
+        super(MemberWindow, self).__init__()
+        self.setupUi(self)
+
+        for member in split:
+            # Add item
+            if member != '':
+                item = QListWidgetItem()
+                item.setText(member)
+                self.member_list.addItem(item)
+       
 # testing: PersonalChatWindow.  
 class PersonalChatWindow(QMainWindow, Ui_personal_chat_window):
 
