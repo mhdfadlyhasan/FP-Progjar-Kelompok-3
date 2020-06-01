@@ -200,6 +200,16 @@ def clientthread(conn, addr, list_of_clients):
                 except:
                     print("gagal mendapatkan room!")
                     conn.send(list_room.encode())
+
+            #testing room member
+            # elif (message[:8] == '<member>'):
+            #     split = message.split(' ')
+            #     roomid = int(split[1])
+            #     room = Room.objects.get(pk=roomid)
+            #     members = Room_Acc.objects.filter(RoomID=room)
+            #     for member in members:
+            #         print(member.AccID.username)
+
             else:
                 print("pesan kosong")
                 remove(conn)
