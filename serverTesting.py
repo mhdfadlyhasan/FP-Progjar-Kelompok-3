@@ -43,7 +43,6 @@ def clientthread(conn, addr, list_of_clients):
     # print(list_of_clients)
     room = 0
     while True:
-        print(room)
         try:
             message = conn.recv(2048).decode()
             print('here')
@@ -84,7 +83,7 @@ def clientthread(conn, addr, list_of_clients):
                 # Code broadcast dengan room id disini
                 
                 # broadcast dengan room dummy
-                broadcast(message_to_send, conn, sender_id)
+                broadcast(message_to_send, conn, sender_id,room.id)
                 # db disini
                 print("simpan ke db")
                 print("ini room " + str(room))
@@ -115,7 +114,8 @@ def clientthread(conn, addr, list_of_clients):
 
                 
                 # Room dummy untuk testing awal
-                room_example.append((conn, str(addr[3])))
+                if((conn, str(addr[3])) not in room_example):
+                    room_example.append((conn, str(addr[3])))
                 print('Room Created with ID ' + split[1])
                 print (room_example)
 
@@ -144,7 +144,7 @@ def clientthread(conn, addr, list_of_clients):
                 split = message.split(' ')
                 print("requested history!")
                 print(split[1])#ini id group
-                room = Room.objects.get(id='1')
+                room = Room.objects.get(id=split[1])
                 print("room didapat")
                 print(str(room))
                 history_pesan=" "
@@ -158,7 +158,8 @@ def clientthread(conn, addr, list_of_clients):
                     conn.send(history_pesan.encode())
                 except:
                     conn.send(history_pesan.encode())
-                room_example.append((conn, str(addr[3])))
+                if((conn, str(addr[3])) not in room_example):
+                    room_example.append((conn, str(addr[3])))
 
             # Send message personal chat
             elif (message[:10] == '<personal>'):
@@ -173,23 +174,24 @@ def clientthread(conn, addr, list_of_clients):
                 try:
                     rooms = Room_Acc.objects.filter(AccID=split[1])
                     print("list room seorang user didapat")
-                    # print(str(rooms))
+                    print(rooms)
                     list_room=""
-                    try:
+                    if(rooms):
                         for messg in rooms:
                             list_room+= str(messg.RoomID) + ","
 
                         conn.send(list_room.encode())
-                    except:
-                        print("gagal!")
-                        conn.send(list_room.encode())
+                    else:
+                        conn.send("Empty!".encode())
                 except:
-                    print("gagal!")
+                    print("gagal mendapatkan room!")
                     conn.send(list_room.encode())
             else:
+                print("pesan kosong")
                 remove(conn)
         except:
-            print("error in the thread! continuing")
+            print("Thread killed!")
+
             break
 
 def personal_chat(message, connection, sender_id, receiver_id):
@@ -205,13 +207,15 @@ def personal_chat(message, connection, sender_id, receiver_id):
                 remove(clients)
                 personal_chat(message, connection, sender_id, sender_id)
 
-def broadcast(message, connection, sender_id):
-    print("broadcasting!")
+def broadcast(message, connection, sender_id,room_id):
+    
     for clients, unique_id in room_example:
         if unique_id != sender_id:
             try:
-                clients.send(message.encode())
+                clients.send(((message) + "<idroom>" + str(room_id)).encode())
+                print("broadcasted! to " + str(room_id))
             except:
+                print("failed to broadcast!")
                 clients.close()
                 remove_group(clients)
 
