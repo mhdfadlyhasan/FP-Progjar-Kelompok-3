@@ -6,8 +6,8 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-from model.FTPClientModel import FTPClientModel
-from view.UiFtpClient import UiFTPClient
+from .model.FTPClientModel import FTPClientModel
+from .view.UiFtpClient import UiFTPClient
 
 
 class LocalListWidget(QListWidget):
@@ -79,14 +79,6 @@ class RemoteListWidget(QListWidget):
                 self.addItem(listItem)
         else:
             event.ignore()
-
-
-# For context menu action
-def delete_action(parent):
-    action = QAction("Delete", parent)
-
-    return action
-
 
 # Subclass QMainWindow to customise your application's main window
 class MainWindow(QMainWindow, UiFTPClient):
