@@ -56,156 +56,157 @@ def clientthread(conn, addr, list_of_clients):
         # print(list_of_clients)
         room = 0
         while True:
-            try:
-                message = conn.recv(2048).decode()
-                print('Message received')
+            # try:
+            message = conn.recv(2048).decode()
+            print('Message received')
 
-                # Terima id orang yang akan di personal chat
-                if (message[:4] == '<id>'):
-                    unique_id = message[4:len(message)]
-                    print(unique_id)
-                    #tunjukkan list pesan ke pengguna! list didapat dari dataase
-                    message = "selamat datang, riwayat pesan anda "
-                    conn.send(message.encode())
-                # Client berhenti
-                elif (message[:6] == '<quit>'):
-                    print('Client with ID ' + str(addr[3]) + ' has left the application')
-                # join (implement plls)
-                elif (message[:6] == '<join>'):
-                    print('join')
-                    split = message.split(' ')
-                    print('masuk create coba edit')
-                    print(userf.id)
-                    # code create room di DB disini
-                    try:
-                        print("try get room")
-                        room = Room.objects.get(RoomName=userf.id)
-                        print("done!")
-                        print(room)
-                        # room_example.append((conn, str(addr[3])))
-                        # print("appending to list!")
-                    except:
-                        print("gagal room")
-                # Send message group chat
-                elif (message[:7] == '<group>'):
+            # Terima id orang yang akan di personal chat
+            if (message[:4] == '<id>'):
+                unique_id = message[4:len(message)]
+                print(unique_id)
+                #tunjukkan list pesan ke pengguna! list didapat dari dataase
+                message = "selamat datang, riwayat pesan anda "
+                conn.send(message.encode())
+            # Client berhenti
+            elif (message[:6] == '<quit>'):
+                print('Client with ID ' + str(addr[3]) + ' has left the application')
+            # join (implement plls)
+            elif (message[:6] == '<join>'):
+                print('join')
+                split = message.split(' ')
+                print('masuk create coba edit')
+                print(userf.id)
+                # code create room di DB disini
+                try:
+                    print("try get room")
+                    room = Room.objects.get(RoomName=userf.id)
+                    print("done!")
+                    print(room)
+                    # room_example.append((conn, str(addr[3])))
+                    # print("appending to list!")
+                except:
+                    print("gagal room")
+            # Send message group chat
+            elif (message[:7] == '<group>'):
 
-                    print("message!" +message)
-                    message_to_send = addr[2] + ':' + message[7:]
-                    sender_id = str(addr[3])
-                    print (addr[2] + ': ' + message[7:])
-                    # Code broadcast dengan room id disini
+                print("message!" +message)
+                message_to_send = addr[2] + ':' + message[7:]
+                sender_id = str(addr[3])
+                print (addr[2] + ': ' + message[7:])
+                # Code broadcast dengan room id disini
+                
+                # broadcast dengan room dummy
+                broadcast(message_to_send, conn, sender_id,room.id)
+                # db disini
+                print("simpan ke db")
+                print("ini room " + str(room))
+                msg_user = User.objects.get(pk=addr[3])
+                
+                print("ini user " + str(msg_user))
+                try:
+                    msg_db = Message.objects.create(room=room,msg=message[7:],AccSent=msg_user,getTime=datetime.datetime.now())
+                    print('success')
+                except:
+                    print('error')
+
+            # create rooom 
+            elif (message[:8] == '<create>'):
+                split = message.split(',')
+                print('masuk create')
+
+                # code create room di DB disini
+                room = Room(RoomName=split[1])
+                room.save()
+
+                # print('Room Created with ID ' + userf.id) 
+                memb = int(addr[3])
+                member = User.objects.get(pk=memb)
+                # print(member.username)
+                roomMemb = Room_Acc.objects.create(AccID=member, RoomID=room)
+
+                # Room dummy untuk testing awal
+                if((conn, str(addr[3])) not in room_example):
+                    room_example.append((conn, str(addr[3])))
+                print('Room Created with name ' + split[1])
+                print (room_example)
+
+            # invite to group
+            elif (message[:8] == '<invite>'):
+                print('masuk invite')
+                split = message.split(' ')
+                invite_id = split[1]
+                print ('invite id:' + invite_id)
+
+                for client in list_of_clients:
+                    print (client[1])
+                    if (str(client[1]) == str(invite_id)):
+                        print('here')
+                        print("Receiver ID: " + client[1])
+                        client_conn = client[0]
+                        try :
+                            inv1 = User.objects.get(pk=int(invite_id))
+                            print(inv1.id)
+                            inv_data = Room_Acc.objects.create(AccID=inv1, RoomID=room)
+                            # print(client_conn)
+                        except :
+                            print('error')
+
+                # room_example.append((client_conn, invite_id)) 
+                # print (room_example)
+
+            elif (message[:9] == '<history>'):
+                split = message.split(' ')
+                print("requested history!")
+                print(userf.id)#ini id group
+                room = Room.objects.get(id=userf.id)
+                print("room didapat")
+                print(str(room))
+                history_pesan=" "
+                try:
+                    pesan = Message.objects.filter(room=room)
                     
-                    # broadcast dengan room dummy
-                    broadcast(message_to_send, conn, sender_id,room.id)
-                    # db disini
-                    print("simpan ke db")
-                    print("ini room " + str(room))
-                    msg_user = User.objects.get(pk=addr[3])
-                    
-                    print("ini user " + str(msg_user))
-                    try:
-                        msg_db = Message.objects.create(room=room,msg=message[7:],AccSent=msg_user,getTime=datetime.datetime.now())
-                        print('success')
-                    except:
-                        print('error')
+                    for messg in pesan:
+                        sender = str(messg.AccSent)
+                        history_pesan+= sender+": " + str(messg.msg) + "\n"
+                    if(pesan): history_pesan = history_pesan[:-1]
+                    conn.send(history_pesan.encode())
+                except:
+                    conn.send(history_pesan.encode())
+                if((conn, str(addr[3])) not in room_example):
+                    room_example.append((conn, str(addr[3])))
 
+            # Send message personal chat
+            elif (message[:10] == '<personal>'):
+                print (addr[2] + ': ' + message[10])
+                message_to_send = addr[2] + ': ' + message[10:]
+                personal_chat(message_to_send, conn, addr[3], unique_id)
+                # db disini
+            elif (message[:10] == '<roomlist>'):
+                split = message.split(' ')
+                print("requested list room seorang user!!")
+                print(userf.id)#ini id group
+                try:
+                    rooms = Room_Acc.objects.filter(AccID=userf.id)
+                    print("list room seorang user didapat")
+                    print(rooms)
+                    list_room=""
+                    if(rooms):
+                        for messg in rooms:
+                            list_room+= str(messg.RoomID) + ","
 
-                # create rooom 
-                elif (message[:8] == '<create>'):
-                    split = message.split(',')
-                    print('masuk create')
-
-                    # code create room di DB disini
-                    room = Room(RoomName=userf.id)
-                    room.save()
-
-                    # print('Room Created with ID ' + userf.id) 
-                    memb = int(addr[3])
-                    member = User.objects.get(pk=memb)
-                    # print(member.username)
-                    roomMemb = Room_Acc.objects.create(AccID=member, RoomID=room)
-
-                    
-                    # Room dummy untuk testing awal
-                    if((conn, str(addr[3])) not in room_example):
-                        room_example.append((conn, str(addr[3])))
-                    print('Room Created with ID ' + userf.id)
-                    print (room_example)
-
-                # invite to group
-                elif (message[:8] == '<invite>'):
-                    print('masuk invite')
-                    split = message.split(' ')
-                    invite_id = userf.id[:1]
-
-                    for client in list_of_clients:
-                        if (client[1] == invite_id):
-                            print("Receiver ID: " + client[1])
-                            client_conn = client[0]
-                            try :
-                                inv1 = User.objects.get(pk=int(invite_id))
-                                # print(inv1.id)
-                                inv_data = Room_Acc.objects.create(AccID=inv1, RoomID=room)
-                                print(client_conn)
-                            except :
-                                print('error')
-
-                    # room_example.append((client_conn, invite_id)) 
-                    # print (room_example)
-
-                elif (message[:9] == '<history>'):
-                    split = message.split(' ')
-                    print("requested history!")
-                    print(userf.id)#ini id group
-                    room = Room.objects.get(id=userf.id)
-                    print("room didapat")
-                    print(str(room))
-                    history_pesan=" "
-                    try:
-                        pesan = Message.objects.filter(room=room)
-                        
-                        for messg in pesan:
-                            sender = str(messg.AccSent)
-                            history_pesan+= sender+": " + str(messg.msg) + "\n"
-                        if(pesan): history_pesan = history_pesan[:-1]
-                        conn.send(history_pesan.encode())
-                    except:
-                        conn.send(history_pesan.encode())
-                    if((conn, str(addr[3])) not in room_example):
-                        room_example.append((conn, str(addr[3])))
-
-                # Send message personal chat
-                elif (message[:10] == '<personal>'):
-                    print (addr[2] + ': ' + message[10])
-                    message_to_send = addr[2] + ': ' + message[10:]
-                    personal_chat(message_to_send, conn, addr[3], unique_id)
-                    # db disini
-                elif (message[:10] == '<roomlist>'):
-                    split = message.split(' ')
-                    print("requested list room seorang user!!")
-                    print(userf.id)#ini id group
-                    try:
-                        rooms = Room_Acc.objects.filter(AccID=userf.id)
-                        print("list room seorang user didapat")
-                        print(rooms)
-                        list_room=""
-                        if(rooms):
-                            for messg in rooms:
-                                list_room+= str(messg.RoomID) + ","
-
-                            conn.send(list_room.encode())
-                        else:
-                            conn.send("Empty!".encode())
-                    except:
-                        print("gagal mendapatkan room!")
                         conn.send(list_room.encode())
-                else:
-                    print("pesan kosong")
-                    remove(conn)
-            except:
-                print("Thread killed!")
+                    else:
+                        conn.send("Empty!".encode())
+                except:
+                    print("gagal mendapatkan room!")
+                    conn.send(list_room.encode())
+            else:
+                print("pesan kosong")
+                remove(conn)
+            # except:
+            #     print("Thread killed!")
 
-                break
+            #     break
 
 def personal_chat(message, connection, sender_id, receiver_id):
     # Mencari id orang yang akan dikirimi pesan

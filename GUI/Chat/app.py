@@ -10,6 +10,7 @@ from model.GroupChatClientModel import GroupChatClientModel
 import sys
 import io
 import signal
+import time
 
 # Subclass QMainWindow to customise your application's main window
 
@@ -51,8 +52,14 @@ class login(QMainWindow, Ui_Login):
 
 class ChatList(QMainWindow, Ui_ChatList):
 
+    connection = None
+
     def __init__(self,connection):
         super(ChatList, self).__init__()
+        self.connection = connection
+        self.setup_ui(self.connection)
+
+    def setup_ui(self,connection):
         self.setupUi(self)
         # Panggil function untuk start thread
         self.client_run(connection)
@@ -87,19 +94,22 @@ class ChatList(QMainWindow, Ui_ChatList):
     def item_click(self):
         roomname = self.chat_list.currentItem().text()
         if(not roomname == "Empty!"): 
-            print(roomname)
-            chat_room_sekarang = roomname[13:-1]
+            index = roomname.find('.')
+            print(index)
+            chat_room_sekarang = roomname[:index]
             connection.current_chat_room = chat_room_sekarang
             self.chat = GroupChatWindow(chat_room_sekarang)#ini harusnya diisi dengan nilai room yang barusan di click
             self.chat.show()
         
-
     def create_group_click(self):
         message, result = QInputDialog.getText(self, 'Room Name', 'Please enter the room name:')
         if result == True:
             message = '<create>,' + message
             sys.stdin = io.StringIO(message)
-            print(message)
+
+            time.sleep(1)
+            # Recreate UI
+            self.setup_ui(self.connection)
 
 # Untuk thread client
 class client_thread(QThread):
@@ -145,7 +155,7 @@ class GroupChatWindow(QMainWindow, Ui_group_chat_window):
         super(GroupChatWindow, self).__init__()
         self.running = True
         self.setupUi(self)
-        print(room_id)
+        print(str(room_id) + "this is room id")
         # When enter is clicked
         self.input.returnPressed.connect(self.message_input)
         
