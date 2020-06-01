@@ -98,7 +98,7 @@ class ChatList(QMainWindow, Ui_ChatList):
 
             # pass room ID here
             print(connection.current_chat_room)
-            self.personal_chat = PersonalChatWindow(connection.current_chat_room)
+            self.personal_chat = PersonalChatWindow(str(connection.current_chat_room))
             self.personal_chat.show()
 
     def create_group_click(self):

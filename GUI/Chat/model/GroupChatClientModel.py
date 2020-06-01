@@ -66,8 +66,8 @@ class GroupChatClientModel:
                     # sorry if broke the whole program
                     if (message[:16] == '<personalroomid>'):
                         split = message.split(',')
-                        print ('Room ID is yes ' + split[1])
-                        current_chat_room = split[1]
+                        self.current_chat_room = split[1]
+                        print ('Room ID is yes ' + str(self.current_chat_room))
                     else:
                         self.list_pesan_sekarang.append(message)
                         print(message)
