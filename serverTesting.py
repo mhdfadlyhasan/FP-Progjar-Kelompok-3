@@ -136,20 +136,22 @@ def clientthread(conn, addr, list_of_clients):
                 split = message.split(' ')
                 invite_id = split[1]
                 print ('invite id:' + invite_id)
+                inv1 = User.objects.get(pk=int(invite_id))
+                Room_Acc.objects.create(AccID=inv1, RoomID=room)
 
-                for client in list_of_clients:
-                    print (client[1])
-                    if (str(client[1]) == str(invite_id)):
-                        print('here')
-                        print("Receiver ID: " + client[1])
-                        client_conn = client[0]
-                        try :
-                            inv1 = User.objects.get(pk=int(invite_id))
-                            print(inv1.id)
-                            inv_data = Room_Acc.objects.create(AccID=inv1, RoomID=room)
-                            # print(client_conn)
-                        except :
-                            print('error')
+                # for client in list_of_clients:
+                #     print (client[1])
+                #     if (str(client[1]) == str(invite_id)):
+                #         print('here')
+                #         print("Receiver ID: " + client[1])
+                #         client_conn = client[0]
+                #         try :
+                #             inv1 = User.objects.get(pk=int(invite_id))
+                #             print(inv1.id)
+                #             inv_data = Room_Acc.objects.create(AccID=inv1, RoomID=room)
+                #             # print(client_conn)
+                #         except :
+                #             print('error')
 
                 # room_example.append((client_conn, invite_id)) 
                 # print (room_example)
