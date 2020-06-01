@@ -157,8 +157,8 @@ def clientthread(conn, addr, list_of_clients):
             elif (message[:9] == '<history>'):
                 split = message.split(' ')
                 print("requested history!")
-                print(userf.id)#ini id group
-                room = Room.objects.get(id=userf.id)
+                print(split[1])#ini id group
+                room = Room.objects.get(id=split[1])
                 print("room didapat")
                 print(str(room))
                 history_pesan=" "
@@ -174,7 +174,6 @@ def clientthread(conn, addr, list_of_clients):
                     conn.send(history_pesan.encode())
                 if((conn, str(addr[3])) not in room_example):
                     room_example.append((conn, str(addr[3])))
-
             # Send message personal chat
             elif (message[:10] == '<personal>'):
                 print (addr[2] + ': ' + message[10])
@@ -192,8 +191,8 @@ def clientthread(conn, addr, list_of_clients):
                     list_room=""
                     if(rooms):
                         for messg in rooms:
-                            list_room+= str(messg.RoomID) + ","
-
+                            print(messg.RoomID.RoomName)
+                            list_room+= str(messg.RoomID.id)+str("." + messg.RoomID.RoomName) + ","
                         conn.send(list_room.encode())
                     else:
                         conn.send("Empty!".encode())
@@ -203,10 +202,6 @@ def clientthread(conn, addr, list_of_clients):
             else:
                 print("pesan kosong")
                 remove(conn)
-            # except:
-            #     print("Thread killed!")
-
-            #     break
 
 def personal_chat(message, connection, sender_id, receiver_id):
     # Mencari id orang yang akan dikirimi pesan
