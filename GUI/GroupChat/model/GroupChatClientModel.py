@@ -2,10 +2,10 @@ import socket
 import select
 import sys
 import msvcrt
-from .CRUDtoDatabase import dbHelper
+# from .CRUDtoDatabase import dbHelper
 
-#init db
-database_tools = dbHelper()
+# #init db
+# database_tools = dbHelper()
 
 class GroupChatClientModel:
     server = None
@@ -57,7 +57,6 @@ class GroupChatClientModel:
 
                 else:
                     message = temp
-
                     # Format <create> ID_room
                     if (message[:8] == '<create>'):
                         split = message.split(',')
@@ -82,8 +81,11 @@ class GroupChatClientModel:
                         self.server.send(message.encode())
 
                     sys.stdout.flush()
-    def group_chat_get_message(self,ID_room,object_gui):
+    def group_chat_get_message(self,object_gui,room_id):
         
         if(len(self.list_pesan_sekarang)>0):#cek apakah lagi dalam chat list sekarang
-            object_gui.message_list.append(self.list_pesan_sekarang[0])
+            
+            pesan = self.list_pesan_sekarang[0].split("<idroom>")
+            if(int(pesan[1])==int(room_id)):
+                object_gui.message_list.append(pesan[0])
             self.list_pesan_sekarang.pop(0)

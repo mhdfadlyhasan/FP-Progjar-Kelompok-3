@@ -8,6 +8,7 @@ from model.GroupChatClientModel import GroupChatClientModel
 # Only needed for access to command line arguments
 import sys
 import io
+import signal
 
 # Subclass QMainWindow to customise your application's main window
 
@@ -51,10 +52,13 @@ class ChatList(QMainWindow, Ui_ChatList):
 
     def item_click(self):
         roomname = self.chat_list.currentItem().text()
-        chat_room_sekarang = roomname[13:-1]
-        connection.current_chat_room = chat_room_sekarang
-        self.chat = GroupChatWindow(chat_room_sekarang)#ini harusnya diisi dengan nilai room yang barusan di click
-        self.chat.show()
+        if(not roomname == "Empty!"): 
+            print(roomname)
+            chat_room_sekarang = roomname[13:-1]
+            connection.current_chat_room = chat_room_sekarang
+            self.chat = GroupChatWindow(chat_room_sekarang)#ini harusnya diisi dengan nilai room yang barusan di click
+            self.chat.show()
+        
 
     def create_group_click(self):
         message, result = QInputDialog.getText(self, 'Room Name', 'Please enter the room name:')
@@ -76,25 +80,36 @@ class client_thread(QThread):
     def run(self):
         while True:
             connection.group_chat()
+        print("main thread killed!")
 
 class client_thread_get(QThread):
-
+    
     global username
     connected = False
     object_gui = ""
-    def __init__(self, connection,object_gui):
+    room_id=""
+    def __init__(self, connection,object_gui,room_id):
         self.object_gui = object_gui
+        self.room_id = room_id
         super(client_thread_get, self).__init__()
-        print('Client_get')
+        print('start new get thread!')
         
     def run(self):
-        while True:
-            connection.group_chat_get_message(1,self.object_gui)#ini juga harus disamaain id room sekarang
+        while self.object_gui.running:
+            try:
+                connection.group_chat_get_message(self.object_gui,self.room_id)#ini juga harus disamaain id room sekarang
+            except:
+                print("closing get thread! somethings wrong!")
+                break
+        else:
+            print("thread closed!")
+        
             
 class GroupChatWindow(QMainWindow, Ui_group_chat_window):
 
     def __init__(self,room_id):
         super(GroupChatWindow, self).__init__()
+        self.running = True
         self.setupUi(self)
         print(room_id)
         # When enter is clicked
@@ -110,11 +125,11 @@ class GroupChatWindow(QMainWindow, Ui_group_chat_window):
         # Listener click list widget item
         self.invite.clicked.connect(self.invite_click)
 
-        #maybe nambah thread disini idk :/
-        self.client_run(connection,self)
+        # nambah thread disini
+        self.client_run(connection,self,room_id)
 
-    def client_run(self,connection,object_gui):
-        self.thread = client_thread_get(connection,object_gui)
+    def client_run(self,connection,object_gui,room_id):
+        self.thread = client_thread_get(connection,object_gui,room_id)
         self.thread.start()
 
     # Detect Message Input
@@ -138,6 +153,15 @@ class GroupChatWindow(QMainWindow, Ui_group_chat_window):
             message = '<invite> ' + message
             sys.stdin = io.StringIO(message)
             print(message)
+
+    def closeEvent(self, event):
+        # do stuff
+        if True:
+            print("window closed!")
+            self.running = False
+            event.accept() # let the window close
+        else:
+            event.ignore()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
