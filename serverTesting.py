@@ -11,9 +11,11 @@ load_dotenv(verbose=True)
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pyNet.settings')
 django.setup()
 from django.db import models
+from django.conf import settings
+from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
 from chat.models import *
-
+from django.contrib.auth import authenticate
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 ip_address = '127.0.0.1'
@@ -31,21 +33,32 @@ def clientthread(conn, addr, list_of_clients):
 
     # Menambahkan username dan id ke addr
     split = packet.split(',')
-    # print(split)
-    temp = list(addr)
-    temp.append(split[0])
-    temp.append(split[1])
-    addr = tuple(temp)
+    # auth
+    username = split[0]
+    password = split[1]
+    userf = authenticate(username=username, password=password, is_active = True)
+    # print(userf.id)
+    if userf is None:
+        print("User not found")
+        conn.send("-1".encode())
+        clientthread(conn, addr, list_of_clients)
+    else:
+        print("Logged In")
+        conn.send('1'.encode())
+        temp = list(addr)
+        temp.append(username)
+        temp.append(userf.id)
+        addr = tuple(temp)
 
-    # Register id
-    list_of_clients.append((conn, str(addr[3]))) 
-    print (str(addr[2]) + ' has joined the chat with ID ' + str(addr[3]))
-    # print(list_of_clients)
-    room = 0
-    while True:
-        try:
+        # Register id
+        list_of_clients.append((conn, str(addr[3]))) 
+        print (str(addr[2]) + ' has joined the chat with ID ' + str(addr[3]))
+        # print(list_of_clients)
+        room = 0
+        while True:
+            # try:
             message = conn.recv(2048).decode()
-            print('here')
+            print('Message received')
 
             # Terima id orang yang akan di personal chat
             if (message[:4] == '<id>'):
@@ -62,11 +75,11 @@ def clientthread(conn, addr, list_of_clients):
                 print('join')
                 split = message.split(' ')
                 print('masuk create coba edit')
-                print(split[1])
+                print(userf.id)
                 # code create room di DB disini
                 try:
                     print("try get room")
-                    room = Room.objects.get(RoomName=split[1])
+                    room = Room.objects.get(RoomName=userf.id)
                     print("done!")
                     print(room)
                     # room_example.append((conn, str(addr[3])))
@@ -96,7 +109,6 @@ def clientthread(conn, addr, list_of_clients):
                 except:
                     print('error')
 
-
             # create rooom 
             elif (message[:8] == '<create>'):
                 split = message.split(',')
@@ -106,17 +118,16 @@ def clientthread(conn, addr, list_of_clients):
                 room = Room(RoomName=split[1])
                 room.save()
 
-                # print('Room Created with ID ' + split[1]) 
+                # print('Room Created with ID ' + userf.id) 
                 memb = int(addr[3])
                 member = User.objects.get(pk=memb)
                 # print(member.username)
                 roomMemb = Room_Acc.objects.create(AccID=member, RoomID=room)
 
-                
                 # Room dummy untuk testing awal
                 if((conn, str(addr[3])) not in room_example):
                     room_example.append((conn, str(addr[3])))
-                print('Room Created with ID ' + split[1])
+                print('Room Created with name ' + split[1])
                 print (room_example)
 
             # testing: create personal room
@@ -145,22 +156,26 @@ def clientthread(conn, addr, list_of_clients):
             elif (message[:8] == '<invite>'):
                 print('masuk invite')
                 split = message.split(' ')
-                invite_id = split[1][:1]
+                invite_id = split[1]
+                print ('invite id:' + invite_id)
+                # inv1 = User.objects.get(pk=int(invite_id))
+                # Room_Acc.objects.create(AccID=inv1, RoomID=room)
 
                 for client in list_of_clients:
-                    if (client[1] == invite_id):
+                    print (client[1])
+                    if (str(client[1]) == str(invite_id)):
+                        print('here')
                         print("Receiver ID: " + client[1])
                         client_conn = client[0]
                         try :
                             inv1 = User.objects.get(pk=int(invite_id))
-                            # print(inv1.id)
-                            inv_data = Room_Acc.objects.create(AccID=inv1, RoomID=room)
-                            print(client_conn)
+                            Room_Acc.objects.create(AccID=inv1, RoomID=room)
+                            # print(client_conn)
                         except :
                             print('error')
 
-                # room_example.append((client_conn, invite_id)) 
-                # print (room_example)
+                room_example.append((client_conn, invite_id)) 
+                print (room_example)
 
             elif (message[:9] == '<history>'):
                 split = message.split(' ')
@@ -169,7 +184,7 @@ def clientthread(conn, addr, list_of_clients):
                 room = Room.objects.get(id=split[1])
                 print("room didapat")
                 print(str(room))
-                history_pesan=" "
+                history_pesan=""
                 try:
                     pesan = Message.objects.filter(room=room)
                     
@@ -182,7 +197,6 @@ def clientthread(conn, addr, list_of_clients):
                     conn.send(history_pesan.encode())
                 if((conn, str(addr[3])) not in room_example):
                     room_example.append((conn, str(addr[3])))
-
             # Send message personal chat
             elif (message[:10] == '<personal>'):
                 print (addr[2] + ': ' + message[10])
@@ -192,16 +206,16 @@ def clientthread(conn, addr, list_of_clients):
             elif (message[:10] == '<roomlist>'):
                 split = message.split(' ')
                 print("requested list room seorang user!!")
-                print(split[1])#ini id group
+                print(userf.id)#ini id group
                 try:
-                    rooms = Room_Acc.objects.filter(AccID=split[1])
+                    rooms = Room_Acc.objects.filter(AccID=userf.id)
                     print("list room seorang user didapat")
                     print(rooms)
                     list_room=""
                     if(rooms):
                         for messg in rooms:
-                            list_room+= str(messg.RoomID) + ","
-
+                            print(messg.RoomID.RoomName)
+                            list_room+= str(messg.RoomID.id)+str(". " + messg.RoomID.RoomName) + ","
                         conn.send(list_room.encode())
                     else:
                         conn.send("Empty!".encode())
@@ -211,10 +225,6 @@ def clientthread(conn, addr, list_of_clients):
             else:
                 print("pesan kosong")
                 remove(conn)
-        except:
-            print("Thread killed!")
-
-            break
 
 def personal_chat(message, connection, sender_id, receiver_id):
     # Mencari id orang yang akan dikirimi pesan
