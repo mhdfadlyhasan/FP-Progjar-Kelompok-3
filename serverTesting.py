@@ -139,11 +139,11 @@ def clientthread(conn, addr, list_of_clients):
                     comm, engage_id, invited_id = split[0], addr[3], split[1]
                     engaging_user = User.objects.get(pk=engage_id)
                     invited_user = User.objects.get(pk=invited_id)
-                    room = Room(RoomName=invited_user.username)
+                    room = Room(RoomName=engaging_user.username + ' - ' + invited_user.username)
                     room.save()
 
                     engage = Room_Acc(AccID=engaging_user, RoomID=room).save()
-                    print('Room created with name ' + invited_user.username)
+                    print('Room created with name ' + engaging_user.username + ' - ' + invited_user.username)
 
                     invite = Room_Acc(AccID=invited_user, RoomID=room).save()
                     print(invited_user.username + ' successfully invited')
