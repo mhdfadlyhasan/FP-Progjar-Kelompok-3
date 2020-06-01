@@ -2,9 +2,12 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from view.GroupChat import Ui_group_chat_window
+from view.PersonalChat import Ui_personal_chat_window
 from view.ChatList import Ui_ChatList
 from view.login import Ui_Login
 from model.GroupChatClientModel import GroupChatClientModel
+
+import time
 
 # Only needed for access to command line arguments
 import sys
@@ -83,6 +86,9 @@ class ChatList(QMainWindow, Ui_ChatList):
         # Listener click list widget item
         self.chat_list.itemClicked.connect(self.item_click)
 
+        # Listener click Personal chat
+        self.personal_chat.clicked.connect(self.personal_chat_click)
+
         # Listener click create group
         self.create_group.clicked.connect(self.create_group_click)
 
@@ -103,7 +109,21 @@ class ChatList(QMainWindow, Ui_ChatList):
             connection.current_chat_room = chat_room_sekarang
             self.chat = GroupChatWindow(chat_room_sekarang)#ini harusnya diisi dengan nilai room yang barusan di click
             self.chat.show()
-        
+    
+    def personal_chat_click(self):
+        message, result = QInputDialog.getText(self, 'Personal Chat', 'Please enter the user\'s ID that will be invited:')
+        if result is True:
+            message = '<createpersonal>,' + message
+            sys.stdin = io.StringIO(message)
+            print(message)
+            time.sleep(1)
+
+            # pass room ID here
+            print(connection.current_chat_room)
+            self.personal_chat = PersonalChatWindow(str(connection.current_chat_room))
+            self.personal_chat.show()
+
+
     def create_group_click(self):
         message, result = QInputDialog.getText(self, 'Room Name', 'Please enter the room name:')
         if result == True:
@@ -206,6 +226,65 @@ class GroupChatWindow(QMainWindow, Ui_group_chat_window):
             message = '<invite> ' + message
             sys.stdin = io.StringIO(message)
             print(message)
+
+    def closeEvent(self, event):
+        # do stuff
+        if True:
+            print("window closed!")
+            self.running = False
+            event.accept() # let the window close
+        else:
+            event.ignore()
+
+# testing: PersonalChatWindow.  
+class PersonalChatWindow(QMainWindow, Ui_personal_chat_window):
+
+    def __init__(self, room_id):
+        super(PersonalChatWindow, self).__init__()
+        self.running = True
+        self.setupUi(self)
+        print(room_id)
+        # When enter is clicked
+        self.input.returnPressed.connect(self.message_input)
+        
+        #get message from db put to message_list, untuk nampilin history chat!
+        print("sending!")
+        connection.server.send(("<history> " + room_id).encode())
+        print("sended!!")
+        message = connection.server.recv(2048).decode()
+        self.message_list.append(message)
+
+        # Listener click list widget item
+        # self.invite.clicked.connect(self.invite_click)
+
+        # nambah thread disini
+        self.client_run(connection,self,room_id)
+
+    def client_run(self,connection,object_gui,room_id):
+        self.thread = client_thread_get(connection,object_gui,room_id)
+        self.thread.start()
+
+    # Detect Message Input
+    def message_input(self):
+        # Ambil input dari GUI
+        message = self.input.text()
+        self.input.clear()
+
+        # Print input user di message list
+        if (message[0] == '<'):
+            pass
+        else:
+            self.message_list.append(str(connection.username) + ': ' + str(message))
+        
+        # Send message ke thread client
+        sys.stdin = io.StringIO(message) 
+
+    # def invite_click(self):
+    #     message, result = QInputDialog.getText(self, 'Invite Person', "Please enter the person's ID:")
+    #     if result == True:
+    #         message = '<invite> ' + message
+    #         sys.stdin = io.StringIO(message)
+    #         print(message)
 
     def closeEvent(self, event):
         # do stuff

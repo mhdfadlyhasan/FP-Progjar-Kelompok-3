@@ -61,8 +61,16 @@ class GroupChatClientModel:
                 if socks == self.server:
                     print('receive')
                     message = socks.recv(2048).decode()
-                    self.list_pesan_sekarang.append(message)
-                    print(message)
+
+                    # testing: follow up <createpersonal>
+                    # sorry if broke the whole program
+                    if (message[:16] == '<personalroomid>'):
+                        split = message.split(',')
+                        self.current_chat_room = split[1]
+                        print ('Room ID is yes ' + str(self.current_chat_room))
+                    else:
+                        self.list_pesan_sekarang.append(message)
+                        print(message)
 
                 else:
                     message = temp
@@ -70,6 +78,12 @@ class GroupChatClientModel:
                     if (message[:8] == '<create>'):
                         split = message.split(',')
                         print ('You created a room with name ' + split[1])
+                        self.server.send(message.encode())
+
+                    # testing: Format <createpersonal> ID_user
+                    elif (message[:16] == '<createpersonal>'):
+                        split = message.split(',')
+                        print ('You created a room with ID ' + split[1])
                         self.server.send(message.encode())
 
                     # Format <invite> ID_user
@@ -83,7 +97,7 @@ class GroupChatClientModel:
                         split = message.split(' ')
                         print ('You joined room with ID ' + split[1])
                         self.server.send(message.encode())
-                        
+
                     else:
                         message = '<group>' + message
                         print(message)

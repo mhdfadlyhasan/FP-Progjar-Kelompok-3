@@ -130,6 +130,28 @@ def clientthread(conn, addr, list_of_clients):
                 print('Room Created with name ' + split[1])
                 print (room_example)
 
+            # testing: create personal room
+            elif (message[:16] == '<createpersonal>'):
+                split = message.split(',')
+                print('create personal')
+
+                try:
+                    comm, engage_id, invited_id = split[0], addr[3], split[1]
+                    engaging_user = User.objects.get(pk=engage_id)
+                    invited_user = User.objects.get(pk=invited_id)
+                    room = Room(RoomName=invited_user.username)
+                    room.save()
+
+                    engage = Room_Acc(AccID=engaging_user, RoomID=room).save()
+                    print('Room created with name ' + invited_user.username)
+
+                    invite = Room_Acc(AccID=invited_user, RoomID=room).save()
+                    print(invited_user.username + ' successfully invited')
+
+                    conn.send(('<personalroomid>,' + str(room.pk)).encode())
+                except :
+                    print("something is wrong with the createpersonal") 
+
             # invite to group
             elif (message[:8] == '<invite>'):
                 print('masuk invite')
@@ -170,6 +192,7 @@ def clientthread(conn, addr, list_of_clients):
                         sender = str(messg.AccSent)
                         history_pesan+= sender+": " + str(messg.msg) + "\n"
                     if(pesan): history_pesan = history_pesan[:-1]
+                    else: conn.send("begin your chat now!".encode())
                     conn.send(history_pesan.encode())
                 except:
                     conn.send(history_pesan.encode())
