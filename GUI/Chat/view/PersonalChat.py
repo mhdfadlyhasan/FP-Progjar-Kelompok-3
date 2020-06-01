@@ -10,16 +10,16 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_group_chat_window(object):
-    def setupUi(self, group_chat_window):
-        group_chat_window.setObjectName("group_chat_window")
-        group_chat_window.resize(800, 600)
-        self.centralwidget = QtWidgets.QWidget(group_chat_window)
+class Ui_personal_chat_window(object):
+    def setupUi(self, personal_chat_window):
+        personal_chat_window.setObjectName("personal_chat_window")
+        personal_chat_window.resize(800, 600)
+        self.centralwidget = QtWidgets.QWidget(personal_chat_window)
         self.centralwidget.setGeometry(QtCore.QRect(0, 0, 798, 571))
         self.centralwidget.setObjectName("centralwidget")
-        self.group_name = QtWidgets.QLabel(self.centralwidget)
-        self.group_name.setGeometry(QtCore.QRect(30, 0, 91, 51))
-        self.group_name.setObjectName("group_name")
+        self.personal_name = QtWidgets.QLabel(self.centralwidget)
+        self.personal_name.setGeometry(QtCore.QRect(30, 0, 91, 51))
+        self.personal_name.setObjectName("personal_name")
         self.upper_line = QtWidgets.QFrame(self.centralwidget)
         self.upper_line.setGeometry(QtCore.QRect(0, 50, 801, 16))
         self.upper_line.setFrameShape(QtWidgets.QFrame.HLine)
@@ -39,15 +39,15 @@ class Ui_group_chat_window(object):
         self.input = QtWidgets.QLineEdit(self.centralwidget)
         self.input.setGeometry(QtCore.QRect(10, 540, 781, 31))
         self.input.setObjectName("input")
-        self.statusbar = QtWidgets.QStatusBar(group_chat_window)
+        self.statusbar = QtWidgets.QStatusBar(personal_chat_window)
         self.statusbar.setGeometry(QtCore.QRect(0, 0, 3, 18))
         self.statusbar.setObjectName("statusbar")
 
-        self.retranslateUi(group_chat_window)
-        QtCore.QMetaObject.connectSlotsByName(group_chat_window)
+        self.retranslateUi(personal_chat_window)
+        QtCore.QMetaObject.connectSlotsByName(personal_chat_window)
 
-    def retranslateUi(self, group_chat_window):
+    def retranslateUi(self, personal_chat_window):
         _translate = QtCore.QCoreApplication.translate
-        group_chat_window.setWindowTitle(_translate("group_chat_window", "MainWindow"))
-        self.group_name.setText(_translate("group_chat_window", "Personal Chat"))
-        self.file.setText(_translate("group_chat_window", "File"))
+        personal_chat_window.setWindowTitle(_translate("personal_chat_window", "MainWindow"))
+        self.personal_name.setText(_translate("personal_chat_window", "Personal Chat"))
+        self.file.setText(_translate("personal_chat_window", "File"))
