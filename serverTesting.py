@@ -192,6 +192,7 @@ def clientthread(conn, addr, list_of_clients):
                         sender = str(messg.AccSent)
                         history_pesan+= sender+": " + str(messg.msg) + "\n"
                     if(pesan): history_pesan = history_pesan[:-1]
+                    else: conn.send("begin your chat now!".encode())
                     conn.send(history_pesan.encode())
                 except:
                     conn.send(history_pesan.encode())
