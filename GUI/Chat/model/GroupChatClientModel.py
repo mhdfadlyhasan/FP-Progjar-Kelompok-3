@@ -9,10 +9,12 @@ database_tools = dbHelper()
 
 class GroupChatClientModel:
     server = None
-    username = None
+    username = ''
+    your_id = ''
     connected = False
     list_pesan_sekarang = []
     current_chat_room = 0
+
     def __init__(self):
         if self.connected == False:
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -21,16 +23,23 @@ class GroupChatClientModel:
             self.server.connect((self.ip_address, self.port))
             self.connected = True
 
-            # Input username & ID sendiri
-            self.username = input("Please enter your username: ")
-            self.your_id = input("Please enter your ID: ")
+            # # Input username & ID sendiri
+            # self.username = input("Please enter your username: ")
+            # self.your_id = input("Please enter your ID: ")
         
-            # Send username + id
-            packet = self.username + ',' + self.your_id
-            self.server.send(packet.encode())
+            # # Send username + id
+            # packet = self.username + ',' + self.your_id
+            # self.server.send(packet.encode())
 
         elif self.connected == True:
             print('Connected to server')
+    
+    # Send login input
+    def send_login(self, username, password):
+        self.username = username
+        self.your_id = password
+        packet = self.username + ',' + self.your_id
+        self.server.send(packet.encode())
 
     # Function terima input dari user
     def group_chat(self):

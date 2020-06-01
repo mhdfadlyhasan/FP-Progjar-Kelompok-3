@@ -3,6 +3,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from view.GroupChat import Ui_group_chat_window
 from view.ChatList import Ui_ChatList
+from view.login import Ui_Login
 from model.GroupChatClientModel import GroupChatClientModel
 
 # Only needed for access to command line arguments
@@ -13,6 +14,28 @@ import io
 
 username = None
 isConnected = False
+connection = GroupChatClientModel()
+
+class login(QMainWindow, Ui_Login):
+
+    username_value = None
+    password_value = None
+
+    def __init__(self):
+        super(login, self).__init__()
+        self.setupUi(self)
+
+        # Detect input
+        self.login.clicked.connect(self.login_clicked)
+
+    def login_clicked(self):
+        self.username_value = self.username.text()
+        self.password_value = self.password.text()
+        if self.username_value != None and self.password_value != None:
+            connection.send_login(self.username_value, self.password_value)
+            self.chatlist = ChatList(connection)
+            self.chatlist.show()
+            self.hide()
 
 class ChatList(QMainWindow, Ui_ChatList):
 
@@ -141,7 +164,7 @@ class GroupChatWindow(QMainWindow, Ui_group_chat_window):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    connection = GroupChatClientModel()
-    window = ChatList(connection)
+    window = login()
+    # window = ChatList(connection)
     window.show()
     app.exec_()
