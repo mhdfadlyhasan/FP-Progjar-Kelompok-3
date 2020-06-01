@@ -86,6 +86,9 @@ class ChatList(QMainWindow, Ui_ChatList):
         # Listener click create group
         self.create_group.clicked.connect(self.create_group_click)
 
+        # Listener click join group
+        self.refresh.clicked.connect(self.refresh_click)
+
     # Custom Functions
     def client_run(self,connection):
         self.thread = client_thread(self)
@@ -106,6 +109,12 @@ class ChatList(QMainWindow, Ui_ChatList):
         if result == True:
             message = '<create>,' + message
             sys.stdin = io.StringIO(message)
+
+            time.sleep(1)
+            # Recreate UI
+            self.setup_ui(self.connection)
+
+    def refresh_click(self):
 
             time.sleep(1)
             # Recreate UI
