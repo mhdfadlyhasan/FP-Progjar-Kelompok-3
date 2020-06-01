@@ -1,7 +1,6 @@
 import socket
 import select
 import sys
-import msvcrt
 # from .CRUDtoDatabase import dbHelper
 
 # #init db
@@ -10,6 +9,7 @@ import msvcrt
 class GroupChatClientModel:
     server = None
     username = ''
+    password = ''
     your_id = ''
     connected = False
     list_pesan_sekarang = []
@@ -33,12 +33,12 @@ class GroupChatClientModel:
 
         elif self.connected == True:
             print('Connected to server')
-    
+
     # Send login input
     def send_login(self, username, password):
         self.username = username
-        self.your_id = password
-        packet = self.username + ',' + self.your_id
+        self.password = password
+        packet = self.username + ',' + self.password
         self.server.send(packet.encode())
 
     # Function terima input dari user

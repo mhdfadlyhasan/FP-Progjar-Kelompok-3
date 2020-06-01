@@ -36,15 +36,15 @@ def clientthread(conn, addr, list_of_clients):
     # auth
     username = split[0]
     password = split[1]
-    userf=authenticate(username=username, password=password, is_active = True)
-    print(userf.id)
+    userf = authenticate(username=username, password=password, is_active = True)
+    # print(userf.id)
     if userf is None:
-        print("not authed Thread killed!")
+        print("User not found")
         conn.send("-1".encode())
+        clientthread(conn, addr, list_of_clients)
     else:
-        print("yay masuk")
-        conn.send(str(userf.id).encode())
-        # print(split)
+        print("Logged In")
+        conn.send('1'.encode())
         temp = list(addr)
         temp.append(username)
         temp.append(userf.id)
@@ -58,7 +58,7 @@ def clientthread(conn, addr, list_of_clients):
         while True:
             try:
                 message = conn.recv(2048).decode()
-                print('here')
+                print('Message received')
 
                 # Terima id orang yang akan di personal chat
                 if (message[:4] == '<id>'):

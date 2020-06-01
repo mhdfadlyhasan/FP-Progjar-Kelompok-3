@@ -25,7 +25,7 @@ class login(QMainWindow, Ui_Login):
     def __init__(self):
         super(login, self).__init__()
         self.setupUi(self)
-
+        self.password.setEchoMode(QLineEdit.Password)
         # Detect input
         self.login.clicked.connect(self.login_clicked)
 
@@ -34,9 +34,20 @@ class login(QMainWindow, Ui_Login):
         self.password_value = self.password.text()
         if self.username_value != None and self.password_value != None:
             connection.send_login(self.username_value, self.password_value)
-            self.chatlist = ChatList(connection)
-            self.chatlist.show()
-            self.hide()
+
+            connected = connection.server.recv(2048).decode()
+            print(connected)
+            if connected == '1':
+                print('connected')
+                self.chatlist = ChatList(connection)
+                self.chatlist.show()
+                self.hide()
+            else:
+                message = QMessageBox()
+                message.setWindowTitle('Login Failed')
+                message.setText('Incorrect username or password')
+                message.setIcon(QMessageBox.Critical)
+                message.exec_()
 
 class ChatList(QMainWindow, Ui_ChatList):
 
