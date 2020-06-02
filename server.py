@@ -96,7 +96,7 @@ def clientthread(conn, addr, list_of_clients):
 
                 print('Group Created with name ' + split[1])
 
-                room_example.append((conn, str(addr[3])))
+                # room_example.append((conn, str(addr[3])))
 
             # Create personal chat
             elif (message[:16] == '<createpersonal>'):
@@ -141,10 +141,7 @@ def clientthread(conn, addr, list_of_clients):
                         except :
                             print('Error occurred when inviting')
 
-                    else:
-                        print("User is offline or doesn't exist")
-
-                room_example.append((client_conn, invite_id)) 
+                # room_example.append((client_conn, invite_id)) 
 
             # Menampilkan history
             elif (message[:9] == '<history>'):
