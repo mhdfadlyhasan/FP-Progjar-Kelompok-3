@@ -176,11 +176,18 @@ class MainWindow(QMainWindow, UiFTPClient):
                     message.exec_()
                     self.client = None
                 else:
-                    self.connectBtn.setText('Disconnect')
+                    if self.client.isSessionTimedOut:
+                        message = QMessageBox()
+                        message.setWindowTitle('Session Timed Out')
+                        message.setText('Error FTP Server.')
+                        message.setIcon(QMessageBox.Critical)
+                        message.exec_()
+                    else:
+                        self.connectBtn.setText('Disconnect')
 
-                    self.remoteDir = self.client.list_dir('.')
+                        self.remoteDir = self.client.list_dir('.')
 
-                    self.parsing_remote_tree_widget(self.remoteDir)
+                        self.parsing_remote_tree_widget(self.remoteDir)
         else:
             self.client.disconnect()
             self.connectBtn.setText('Connect')

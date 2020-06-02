@@ -9,6 +9,7 @@ from urllib import parse
 class FTPClientModel:
     isConnected = False
     isErrorPerm = False
+    isSessionTimedOut = False
     client = None
     username = 'test'
     password = '123'
@@ -31,9 +32,13 @@ class FTPClientModel:
         return self
 
     def disconnect(self):
-        if self.isConnected:
-            self.isConnected = False
-            self.client.quit()
+        try:
+            if self.isConnected:
+                self.isConnected = False
+                self.client.quit()
+        except ftplib.error_reply:
+            self.isSessionTimedOut = True
+
 
     def list_dir(self, *args) -> list:
         list_dir = []
