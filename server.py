@@ -128,7 +128,7 @@ def clientthread(conn, addr, list_of_clients):
 
                 # Mencari user 
                 for client in list_of_clients:
-
+                    print(str(client[1]))
                     # Jika online
                     if (str(client[1]) == str(invite_id)):
                         print("Receiver ID: " + client[1])
@@ -144,7 +144,7 @@ def clientthread(conn, addr, list_of_clients):
                     else:
                         print("User is offline or doesn't exist")
 
-                room_example.append((client_conn, invite_id)) 
+                #room_example.append((client_conn, invite_id)) 
 
             # Menampilkan history
             elif (message[:9] == '<history>'):
