@@ -96,8 +96,6 @@ def clientthread(conn, addr, list_of_clients):
 
                 print('Group Created with name ' + split[1])
 
-                # room_example.append((conn, str(addr[3])))
-
             # Create personal chat
             elif (message[:16] == '<createpersonal>'):
                 split = message.split(',')
@@ -116,7 +114,7 @@ def clientthread(conn, addr, list_of_clients):
                     invite = Room_Acc(AccID=invited_user, RoomID=room).save()
                     print(invited_user.username + ' successfully invited')
 
-                    conn.send(('<personalroomid>,' + str(room.pk)).encode())
+                    # conn.send(('<personalroomid>,' + str(room.pk)).encode())
                 except :
                     print("Error when creating personal chat room") 
 
@@ -141,8 +139,6 @@ def clientthread(conn, addr, list_of_clients):
                         except :
                             print('Error occurred when inviting')
 
-                # room_example.append((client_conn, invite_id)) 
-
             # Menampilkan history
             elif (message[:9] == '<history>'):
                 split = message.split(' ')
@@ -162,9 +158,6 @@ def clientthread(conn, addr, list_of_clients):
 
                 except:
                     conn.send(history_pesan.encode())
-
-                if((conn, str(addr[3])) not in room_example):
-                    room_example.append((conn, str(addr[3])))
             
             # Mendapatkan room list
             elif (message[:10] == '<roomlist>'):
@@ -211,7 +204,7 @@ def clientthread(conn, addr, list_of_clients):
 # Function broadcast message
 def broadcast(message, connection, sender_id,room_id):
     
-    for clients, unique_id in room_example:
+    for clients, unique_id in list_of_clients:
         if unique_id != sender_id:
             try:
                 clients.send(((message) + "<idroom>" + str(room_id)).encode())
@@ -225,9 +218,7 @@ def broadcast(message, connection, sender_id,room_id):
 def remove(connection):
     if connection in list_of_clients:
         list_of_clients.remove(connection)
-    
-    if connection in room_example:
-        room_example.remove(connection)
+
 
 while True:
     # Accept dari client
