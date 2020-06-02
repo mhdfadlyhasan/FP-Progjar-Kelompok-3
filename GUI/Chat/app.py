@@ -167,7 +167,8 @@ class ChatList(QMainWindow, Ui_ChatList):
         time.sleep(1)
 
         # Recreate UI
-        self.setup_ui(self.connection)
+        # self.setup_ui(self.connection)
+        self.setup_ui(self.connection,self.connection.your_id)
 
 
 # Untuk thread client
