@@ -14,7 +14,7 @@ python manage.py runserver 8080
 2. isi env sesuai konfigurasi
 3. buka phpmyadmin dari xampp, jalankan mysql
 4. buatlah sebuah database dengan nama sesuai isi dari konfigurasi .env anda
-5. python manage.py migrate
+5. jalankan query yang ada di db.sql kedalam database anda!
 
 ### Using FTPClient
 1. ```cd GUI/FTPClient```
@@ -26,6 +26,18 @@ python manage.py runserver 8080
     * Password (default: 123)
     * Port (default 8009)
 5. Optional - Ganti akun di FTPServerModel.py, parameter init
+
+
+#### Register
+1. ```python manage.py runserver``` pastikan sudah menjalankan dan mempersiapkan database mysql 
+2. buka localhost. 
+3. verifikasi email
+
+#### Using Chat
+1. ```python server.py```
+2. jalankan ```cd GUI/FTPClient``` untuk membuka aplikasi
+3. login
+
 
 #### Fitur
 * Drag and drop dari local filesystem ke remote
