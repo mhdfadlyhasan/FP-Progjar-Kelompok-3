@@ -29,6 +29,7 @@ class FTPClientModel:
         except ftplib.error_perm:
             self.isErrorPerm = True
         self.isConnected = True
+        self.isSessionTimedOut = False
         return self
 
     def disconnect(self):
@@ -36,8 +37,9 @@ class FTPClientModel:
             if self.isConnected:
                 self.isConnected = False
                 self.client.quit()
-        except ftplib.error_reply:
+        except ftplib.all_errors:
             self.isSessionTimedOut = True
+            self.isConnected = False
 
 
     def list_dir(self, *args) -> list:
