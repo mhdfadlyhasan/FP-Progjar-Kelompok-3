@@ -28,17 +28,11 @@ class login(QMainWindow, Ui_Login):
     def __init__(self):
         super(login, self).__init__()
         self.setupUi(self)
-        self.actionExit.triggered.connect(qApp.quit)
-        self.actionLaunchFTP.triggered.connect(self.launch_ftp)
-        self.ftp = FTPClient()
         # Password hidden
         self.password.setEchoMode(QLineEdit.Password)
 
         # Listener login button
         self.login.clicked.connect(self.login_clicked)
-
-    def launch_ftp(self):
-        self.ftp.show()
 
     # Function login button
     def login_clicked(self):
@@ -53,7 +47,7 @@ class login(QMainWindow, Ui_Login):
             # Mengirim data ke client
             connection.send_login(self.username_value, self.password_value)
 
-            # Menerima response dari server
+            # Menerima response dari server berupa ID user / -1 jika gagal
             connected = connection.server.recv(2048).decode()
 
             # Jika username atau password salah
@@ -239,6 +233,9 @@ class ChatWindow(QMainWindow, Ui_chat_window):
         # Listener click member
         self.show_member.clicked.connect(self.member_click)
 
+        # Listener FTP
+        self.file.clicked.connect(self.launch_ftp)
+
         # Untuk memanggil function menjalankan thread get di client
         self.client_run(connection, self, room_id)
 
@@ -246,6 +243,11 @@ class ChatWindow(QMainWindow, Ui_chat_window):
     def client_run(self, connection, object_gui, room_id):
         self.thread = client_thread_get(connection, object_gui, room_id)
         self.thread.start()
+
+    # Membuka FTP
+    def launch_ftp(self):
+        self.ftp = FTPClient()
+        self.ftp.show()
 
     # Function untuk mengambil input dari user
     def message_input(self):
