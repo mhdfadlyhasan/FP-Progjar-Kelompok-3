@@ -30,7 +30,7 @@ class FTPServerModel:
         self.user = authenticate(username=username, password=password, is_active=True)
         if self.user is None:
             print("User tidak ditemukan")
-            sys.exit(0)
+            # sys.exit(0)
         self.authorizer_server()
         self.handler_server()
         self.connect()
