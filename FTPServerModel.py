@@ -20,10 +20,10 @@ class FTPServerModel:
     authorizer = None
     handler = None
     address = ('127.0.0.1', 8009)
-    default_path = os.path.abspath('../file')
+    default_path = os.path.abspath('GUI/Chat/FTPClient/file')
     permission_attr = 'elradfmwMT'
 
-    def __init__(self, address=('127.0.0.1', 8009), username='dex', password='123'):
+    def __init__(self, address=('127.0.0.1', 8009), username='test', password='123'):
         self.address = address
         self.password = password
         self.username = username
