@@ -6,7 +6,7 @@ from view.login import Ui_Login
 from view.MemberList import Ui_member
 from model.ChatClientModel import ChatClientModel
 
-from GUI.Chat.FTPClient.app import MainWindow as FTPClient
+from FTPClient.app import MainWindow as FTPClient
 
 # Only needed for access to command line arguments
 import sys
