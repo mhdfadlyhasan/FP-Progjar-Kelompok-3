@@ -216,8 +216,6 @@ class ChatWindow(QMainWindow, Ui_chat_window):
         super(ChatWindow, self).__init__()
         self.running = True
         self.setupUi(self)
-        self.file.triggered.connect(self.launch_ftp)
-        self.ftp = FTPClient()
         self.room_id = room_id
 
         # Menampilkan history chat
@@ -242,6 +240,7 @@ class ChatWindow(QMainWindow, Ui_chat_window):
         self.client_run(connection, self, room_id)
 
     def launch_ftp(self):
+        self.ftp = FTPClient()
         self.ftp.show()
 
     # Function menjalankan thread get
