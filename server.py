@@ -56,23 +56,24 @@ def clientthread(conn, addr, list_of_clients):
         list_of_clients.append((conn, str(addr[3]))) 
         print (str(addr[2]) + ' has logged in with ID ' + str(addr[3]))
     
-        room = 0
+        room_id = 0
         while True:
-            
             message = conn.recv(2048).decode()
+            print(message)
             print('Message received')
 
             # Send message group chat
             if (message[:7] == '<chats>'):
-                
+                print("diterima")
                 # Message yang akan di send
                 message_to_send = addr[2] + ':' + message[7:]
                 sender_id = str(addr[3])
                 
                 # Broadcast
-                broadcast(message_to_send, conn, sender_id,room.id)
-                msg_user = User.objects.get(pk=addr[3])
                 
+                broadcast(message_to_send, conn, sender_id,room_id)
+                msg_user = User.objects.get(pk=addr[3])
+                print("diterima user didapat")
                 # Menaruh message di DB
                 try:
                     msg_db = Message.objects.create(room=room,msg=message[7:],AccSent=msg_user,getTime=datetime.datetime.now())
@@ -144,8 +145,10 @@ def clientthread(conn, addr, list_of_clients):
                 split = message.split(' ')
                 print("Chat history requested...")
                 room = Room.objects.get(id=split[1])
+                room_id = room.id
                 history_pesan=""
-
+                print(room.id)
+                room_example.append((conn,str(userf.id),str(room.id)))
                 try:
                     pesan = Message.objects.filter(room=room)
                     
@@ -171,7 +174,6 @@ def clientthread(conn, addr, list_of_clients):
                     list_room=""
                     if(rooms):
                         for messg in rooms:
-                            print(messg.RoomID.RoomName)
                             list_room+= str(messg.RoomID.id)+str(". " + messg.RoomID.RoomName) + ","
                         conn.send(list_room.encode())
                         print("Room list sent")
@@ -191,33 +193,34 @@ def clientthread(conn, addr, list_of_clients):
                 room = Room.objects.get(pk=roomid)
                 members = Room_Acc.objects.filter(RoomID=room)
                 member_list = ''
-
+                print("get member")
                 for member in members:
                     member_list += member.AccID.username + ','
                 
                 conn.send(member_list.encode())
 
             else:
-                print("Empty message")
-                remove(conn)
+                print("Empty message killing thread")
+                print(str(conn),str(userf.id),str(room.id))
+                remove(conn,userf.id,room.id)
 
 # Function broadcast message
 def broadcast(message, connection, sender_id,room_id):
-    
-    for clients, unique_id in list_of_clients:
+    for clients, unique_id, room_ids in room_example:
         if unique_id != sender_id:
-            try:
-                clients.send(((message) + "<idroom>" + str(room_id)).encode())
-                print("Broadcasted to " + str(room_id))
-            except:
-                print("Failed to broadcast!")
-                clients.close()
-                remove(clients)
+            if int(room_ids) == room_id:
+                try:
+                    clients.send(((message) + "<idroom>" + str(room_id)).encode())
+                    print("Broadcasted to " + str(room_id))
+                except:
+                    print("Failed to broadcast!")
 
 # Function remove
-def remove(connection):
-    if connection in list_of_clients:
-        list_of_clients.remove(connection)
+def remove(connection,id_user,room_id):
+    print("removing room")
+    if (connection,str(id_user),str(room_id)) in room_example:
+        print("Thread killed, removed from room too!")
+        room_example.remove((connection,str(id_user),str(room_id)))
 
 
 while True:

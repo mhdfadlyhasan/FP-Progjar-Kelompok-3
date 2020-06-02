@@ -205,6 +205,7 @@ class client_thread_get(QThread):
                 print("Closing get thread! Error occurred!")
                 break
         else:
+            connection.server.send(" ".encode())
             print("Thread closed!")
 
 
@@ -293,11 +294,9 @@ class ChatWindow(QMainWindow, Ui_chat_window):
     # Close Window Chat
     def closeEvent(self, event):
         if True:
-            time.sleep(0.5)
             print("Chat window closed!")
             self.running = False
             event.accept()
-            time.sleep(0.5)
 
         else:
             event.ignore()
