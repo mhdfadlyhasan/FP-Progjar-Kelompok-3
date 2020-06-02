@@ -293,10 +293,11 @@ class ChatWindow(QMainWindow, Ui_chat_window):
     # Close Window Chat
     def closeEvent(self, event):
         if True:
-            time.sleep(0.2)
+            time.sleep(0.5)
             print("Chat window closed!")
             self.running = False
             event.accept()
+            time.sleep(0.5)
 
         else:
             event.ignore()
