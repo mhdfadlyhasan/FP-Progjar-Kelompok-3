@@ -29,8 +29,8 @@ class login(QMainWindow, Ui_Login):
         super(login, self).__init__()
         self.setupUi(self)
         self.actionExit.triggered.connect(qApp.quit)
-        self.actionLaunchFTP.triggered.connect(self.launch_ftp)
-        self.ftp = FTPClient()
+        # self.actionLaunchFTP.triggered.connect(self.launch_ftp)
+        # self.ftp = FTPClient()
         # Password hidden
         self.password.setEchoMode(QLineEdit.Password)
 
@@ -222,6 +222,8 @@ class ChatWindow(QMainWindow, Ui_chat_window):
         super(ChatWindow, self).__init__()
         self.running = True
         self.setupUi(self)
+        self.file.triggered.connect(self.launch_ftp)
+        self.ftp = FTPClient()
         self.room_id = room_id
 
         # Menampilkan history chat
@@ -241,6 +243,9 @@ class ChatWindow(QMainWindow, Ui_chat_window):
 
         # Untuk memanggil function menjalankan thread get di client
         self.client_run(connection, self, room_id)
+
+    def launch_ftp(self):
+        self.ftp.show()
 
     # Function menjalankan thread get
     def client_run(self, connection, object_gui, room_id):
