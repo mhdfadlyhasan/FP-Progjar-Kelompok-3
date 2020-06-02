@@ -84,7 +84,7 @@ class RemoteListWidget(QListWidget):
 # Subclass QMainWindow to customise your application's main window
 class MainWindow(QMainWindow, UiFTPClient):
     client = None
-    username = "dex"
+    username = "test"
     password = "123"
     host = '127.0.0.1'
     port = 8009
@@ -145,19 +145,42 @@ class MainWindow(QMainWindow, UiFTPClient):
         return super(MainWindow, self).eventFilter(widget, event)
 
     def connect_slot(self):
-        if not self.client.isConnected:
-            self.username = self.usernameInput.text()
-            self.password = self.passwordInput.text()
-            self.host = self.hostInput.text()
-            self.port = int(self.portInput.text())
+        if self.client is None:
+            username = self.usernameInput.text()
+            password = self.passwordInput.text()
+            host = self.hostInput.text()
+            port = self.portInput.text()
+            self.client = FTPClientModel()
+            self.client.connect(username, password,
+                                host, int(port))
+        elif not self.client.isConnected:
+            username = self.usernameInput.text()
+            password = self.passwordInput.text()
+            host = self.hostInput.text()
+            port = self.portInput.text()
 
-            self.client.connect(self.username, self.password,
-                                self.host, self.port)
-            self.connectBtn.setText('Disconnect')
+            if username is "" or password is "" or host is None or port is None:
+                message = QMessageBox()
+                message.setWindowTitle('Login Failed')
+                message.setText('Username dan Password harus di isi')
+                message.setIcon(QMessageBox.Critical)
+                message.exec_()
+            else:
+                self.client.connect(username, password,
+                                    host, int(port))
+                if self.client.isErrorPerm:
+                    message = QMessageBox()
+                    message.setWindowTitle('Login Failed')
+                    message.setText('Error FTP Server. Mungkin akun tidak valid')
+                    message.setIcon(QMessageBox.Critical)
+                    message.exec_()
+                    self.client = None
+                else:
+                    self.connectBtn.setText('Disconnect')
 
-            self.remoteDir = self.client.list_dir('.')
+                    self.remoteDir = self.client.list_dir('.')
 
-            self.parsing_remote_tree_widget(self.remoteDir)
+                    self.parsing_remote_tree_widget(self.remoteDir)
         else:
             self.client.disconnect()
             self.connectBtn.setText('Connect')

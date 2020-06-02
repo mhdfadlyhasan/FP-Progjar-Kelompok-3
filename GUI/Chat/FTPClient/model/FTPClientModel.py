@@ -1,4 +1,5 @@
 from ftplib import FTP
+import ftplib
 from pathlib import PurePath, Path
 from zipfile import ZipFile
 import os
@@ -7,8 +8,9 @@ from urllib import parse
 
 class FTPClientModel:
     isConnected = False
+    isErrorPerm = False
     client = None
-    username = 'dex'
+    username = 'test'
     password = '123'
     address = '127.0.0.1'
     port = 8009
@@ -20,8 +22,11 @@ class FTPClientModel:
         self.client = FTP()
 
     def connect(self, username=None, password=None, address=None, port=None):
-        self.client.connect(address or self.address, port or self.port)
-        self.client.login(username or self.username, password or self.password)
+        try:
+            self.client.connect(address or self.address, port or self.port)
+            self.client.login(username or self.username, password or self.password)
+        except ftplib.error_perm:
+            self.isErrorPerm = True
         self.isConnected = True
         return self
 

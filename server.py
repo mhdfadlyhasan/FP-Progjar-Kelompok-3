@@ -128,7 +128,7 @@ def clientthread(conn, addr, list_of_clients):
 
                 # Mencari user 
                 for client in list_of_clients:
-
+                    print(str(client[1]))
                     # Jika online
                     if (str(client[1]) == str(invite_id)):
                         print("Receiver ID: " + client[1])
