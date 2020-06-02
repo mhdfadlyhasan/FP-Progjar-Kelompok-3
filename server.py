@@ -44,7 +44,7 @@ def clientthread(conn, addr, list_of_clients):
         clientthread(conn, addr, list_of_clients)
 
     else:
-        conn.send('1'.encode())
+        conn.send(str(userf.id).encode())
 
         # Menambahkan username dan id ke addr
         temp = list(addr)

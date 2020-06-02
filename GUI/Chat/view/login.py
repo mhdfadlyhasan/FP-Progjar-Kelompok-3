@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Login(object):
     def setupUi(self, Login):
         Login.setObjectName("Login")
-        Login.resize(449, 311)
+        Login.resize(449, 350)
         self.centralwidget = QtWidgets.QWidget(Login)
         self.centralwidget.setObjectName("centralwidget")
         self.Title = QtWidgets.QLabel(self.centralwidget)
