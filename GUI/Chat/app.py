@@ -19,7 +19,6 @@ username = None
 isConnected = False
 connection = ChatClientModel()
 
-
 # Window untuk login
 class login(QMainWindow, Ui_Login):
     # Value awal username dan password
@@ -41,7 +40,6 @@ class login(QMainWindow, Ui_Login):
     def launch_ftp(self):
         self.ftp.show()
 
-
     # Function login button
     def login_clicked(self):
 
@@ -58,20 +56,21 @@ class login(QMainWindow, Ui_Login):
             # Menerima response dari server
             connected = connection.server.recv(2048).decode()
 
-            # Jika username dan password benar
-            if connected == '1':
-                print('Login Successful')
-                self.chatlist = ChatList(connection)
-                self.chatlist.show()
-                self.hide()
-
             # Jika username atau password salah
-            else:
+            if connected == '-1':
                 message = QMessageBox()
                 message.setWindowTitle('Login Failed')
                 message.setText('Incorrect username or password')
                 message.setIcon(QMessageBox.Critical)
                 message.exec_()
+
+            # Jika username dan password benar
+            else:
+                user_id = connected
+                print('Login Successful')
+                self.chatlist = ChatList(connection, user_id)
+                self.chatlist.show()
+                self.hide()
 
         # Jika salah satu data kosong
         else:
@@ -81,18 +80,20 @@ class login(QMainWindow, Ui_Login):
             message.setIcon(QMessageBox.Critical)
             message.exec_()
 
-
 # Window untuk chatlist
 class ChatList(QMainWindow, Ui_ChatList):
     connection = None
 
-    def __init__(self, connection):
+    def __init__(self, connection, user_id):
         super(ChatList, self).__init__()
         self.connection = connection
-        self.setup_ui(self.connection)
-
-    def setup_ui(self, connection):
+        self.setup_ui(self.connection, user_id)
+        
+    def setup_ui(self, connection, user_id):
         self.setupUi(self)
+
+        # Set value User ID
+        self.Value.setText(user_id)
 
         # Panggil function untuk start running client thread
         self.client_run(connection)
