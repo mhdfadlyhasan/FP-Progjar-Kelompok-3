@@ -66,6 +66,7 @@ class login(QMainWindow, Ui_Login):
 
             # Jika username dan password benar
             else:
+                connection.your_id = connected
                 user_id = connected
                 print('Login Successful')
                 self.chatlist = ChatList(connection, user_id)
@@ -153,7 +154,7 @@ class ChatList(QMainWindow, Ui_ChatList):
             time.sleep(1)
 
             # Recreate UI
-            self.setup_ui(self.connection)
+            self.setup_ui(self.connection,self.connection.your_id)
 
     # Function create group button
     def create_group_click(self):
@@ -165,7 +166,7 @@ class ChatList(QMainWindow, Ui_ChatList):
             time.sleep(1)
 
             # Recreate UI
-            self.setup_ui(self.connection)
+            self.setup_ui(self.connection,self.connection.your_id)
 
     # Function refresh button
     def refresh_click(self):
